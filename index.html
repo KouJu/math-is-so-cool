@@ -127,6 +127,10 @@ sup{font-size:.68em}
 figure{margin:0}
 figcaption{font-size:.8rem;color:var(--ink-3);margin-top:.5em;line-height:1.55}
 svg.plot{width:100%;max-width:100%;height:auto;display:block}
+svg.grabby{cursor:grab;touch-action:none}
+svg.grabby.grabbing{cursor:grabbing}
+svg.grabby:focus-visible{outline:2px solid var(--teal);outline-offset:3px;border-radius:4px}
+.readout i{font-style:italic}
 
 /* SVG 共通クラス */
 .grid-l{stroke:var(--rule-soft);stroke-width:1}
@@ -282,7 +286,12 @@ blockquote:last-of-type{border-left-color:var(--violet)}
     </div>
     <figure>
       <svg class="plot" id="coreSvg" viewBox="0 0 470 340" role="img"
-        aria-label="y = x の2乗 − 7x + 10 のグラフ。展開形は縦軸との交点10、因数分解形は x=2 と x=5、3つめは2つのゼロ点の真ん中にある最低点(3.5, −2.25)を示す。"></svg>
+        aria-label="y = x の2乗 − 7x + 10 のグラフ。展開形は縦軸との交点10、因数分解形は x=2 と x=5、3つめは2つのゼロ点の真ん中にある最低点(3.5, −2.25)を示す。曲線上の黒い点は左右にドラッグできる。"></svg>
+      <div style="display:flex;gap:9px;align-items:baseline;flex-wrap:wrap;margin-top:12px">
+        <span class="tag">点をドラッグ</span>
+        <span class="readout" id="coreRead" aria-live="polite" style="white-space:normal;line-height:1.9"></span>
+      </div>
+      <p class="small" id="coreSign" style="margin:9px 0 0;font-weight:700"></p>
       <figcaption id="coreCap">3つの形はすべて同じ曲線を描く。形を選ぶと、その形が教えてくれる点が光る。</figcaption>
     </figure>
   </div>
@@ -338,6 +347,7 @@ blockquote:last-of-type{border-left-color:var(--violet)}
       <div class="ctrl">
         <button class="btn" id="ballPlay">投げる</button>
         <span class="readout" id="ballRead"><b><i>t</i></b> = 0.00 s　<b><i>h</i></b> = 0.0 m</span>
+        <span class="tag">図を直接ドラッグ</span>
       </div>
       <div class="punch">解の公式は、使っていない。<br>因数分解できた瞬間に、答えは<span style="color:var(--teal)">読むだけ</span>になった。</div>
     </div>
@@ -372,6 +382,7 @@ blockquote:last-of-type{border-left-color:var(--violet)}
         <label for="freq">周波数</label>
         <input type="range" id="freq" min="6" max="21" step="0.04" value="8.6">
         <span class="readout" id="freqRead"><b><i>f</i></b> = 8.60 MHz</span>
+        <span class="tag">図を直接ドラッグ</span>
       </div>
       <div class="statebox" id="nfcState">まだ反応しない。式の値が 0 から離れている。</div>
       <div class="punch">因数分解は、設計図そのもの。<br>「<span style="color:var(--teal)">0 になる <i>f</i></span>」を決めることが、部品の値を決めることだった。</div>
@@ -405,6 +416,7 @@ blockquote:last-of-type{border-left-color:var(--violet)}
         <label for="pos">トラックの位置</label>
         <input type="range" id="pos" min="-8" max="8" step="0.05" value="0">
         <span class="readout" id="posRead"><b><i>x</i></b> = 0.00 m</span>
+        <span class="tag">トラックを直接ドラッグ</span>
       </div>
       <div class="statebox ok" id="tunState">通れる。天井までの余裕 1.90 m</div>
       <div class="punch">道路の車線が中央寄りにあるのは、デザインではない。<br>この<span style="color:var(--teal)">式が出した境界</span>そのもの。</div>
@@ -439,6 +451,7 @@ blockquote:last-of-type{border-left-color:var(--violet)}
         <label for="price">値上げ額</label>
         <input type="range" id="price" min="-45" max="105" step="1" value="0">
         <span class="readout" id="priceRead"><b>100 円</b>・200 個</span>
+        <span class="tag">点を直接ドラッグ</span>
       </div>
       <div class="statebox" id="profState">利益 8,000 円／日</div>
       <div class="punch">因数分解が出した2つのゼロ点は、<br><span style="color:var(--teal)">赤字と黒字の境界線</span>だった。そして真ん中が、答え。</div>
@@ -505,6 +518,49 @@ function fpath(f,X,Y,x0,x1,n){var d="",i,x;n=n||220;
   for(i=0;i<=n;i++){x=x0+(x1-x0)*i/n;d+=(i?"L":"M")+X(x).toFixed(2)+" "+Y(f(x)).toFixed(2);}return d;}
 function fmt(v,n){return v.toFixed(n);}
 function yen(v){return Math.round(v).toLocaleString("ja-JP");}
+function num(v){return String(Math.round(v*1000)/1000).replace("-","−");}
+function par(v){return v<0?"(−"+num(-v)+")":num(v);}
+/* 画面座標 → データ座標（線形スケールの逆関数） */
+function scInv(d0,d1,r0,r1){var m=(d1-d0)/(r1-r0);return function(r){return d0+(r-r0)*m;};}
+/* 図の中の点を横方向にドラッグできるようにする。
+   どこを押してもその x に点が飛び、そのまま追従する。矢印キーにも対応。 */
+function dragAlongX(svg,invX,lo,hi,step,get,set){
+  var on=false;
+  function clamp(x){
+    if(step)x=Math.round(x/step)*step;
+    return Math.max(lo,Math.min(hi,Math.round(x*1e6)/1e6));
+  }
+  function fromEv(ev){
+    var m=svg.getScreenCTM(); if(!m)return null;
+    var inv=m.inverse(),p;
+    if(window.DOMPoint){p=new DOMPoint(ev.clientX,ev.clientY).matrixTransform(inv);}
+    else{p=svg.createSVGPoint();p.x=ev.clientX;p.y=ev.clientY;p=p.matrixTransform(inv);}
+    return clamp(invX(p.x));
+  }
+  svg.classList.add("grabby");
+  svg.setAttribute("tabindex","0");
+  svg.addEventListener("pointerdown",function(ev){
+    var v=fromEv(ev); if(v===null)return;
+    on=true; svg.classList.add("grabbing");
+    try{svg.setPointerCapture(ev.pointerId);}catch(e){}
+    set(v); ev.preventDefault();
+  });
+  svg.addEventListener("pointermove",function(ev){
+    if(!on)return; var v=fromEv(ev); if(v!==null)set(v); ev.preventDefault();
+  });
+  function end(ev){
+    if(!on)return; on=false; svg.classList.remove("grabbing");
+    try{svg.releasePointerCapture(ev.pointerId);}catch(e){}
+  }
+  svg.addEventListener("pointerup",end);
+  svg.addEventListener("pointercancel",end);
+  svg.addEventListener("keydown",function(ev){
+    var d=ev.key==="ArrowLeft"?-1:ev.key==="ArrowRight"?1:0;
+    if(!d)return;
+    ev.preventDefault(); ev.stopPropagation();   /* ページ送りに流さない */
+    set(clamp(get()+d*(step||1)));
+  });
+}
 
 /* ══════════ 1. 3つの顔 ══════════ */
 var coreSel=0, coreHL=[];
@@ -572,8 +628,44 @@ var coreSel=0, coreHL=[];
   C.appendChild(el("text",{x:X(3.75),y:Y(-2.25)+36,"class":"lab-m",fill:"var(--violet)"},"x = 7/2,  y = -9/4"));
   svg.appendChild(C);
 
+  /* 曲線上をすべる探索点（ドラッグできる） */
+  var gLine=el("line",{"class":"dash",stroke:"var(--ink-3)","stroke-width":1.3});
+  svg.appendChild(gLine);
+  var gHalo=el("circle",{r:14,fill:"var(--ink-3)",opacity:.16});
+  svg.appendChild(gHalo);
+  var gDot=el("circle",{r:7.5,fill:"var(--ink)",stroke:"var(--stage)","stroke-width":2.5});
+  svg.appendChild(gDot);
+  var gTag=el("text",{"class":"lab-m",fill:"var(--ink)","text-anchor":"middle"},"");
+  svg.appendChild(gTag);
+
   coreHL=[A,B,C];
   var faces=[].slice.call(document.querySelectorAll(".face"));
+  var readEl=document.getElementById("coreRead"), signEl=document.getElementById("coreSign");
+  var cxv=4;
+
+  function drawCore(){
+    var x=cxv, y=f(x), u=x-2, w=x-5;
+    gLine.setAttribute("x1",X(x)); gLine.setAttribute("y1",Y(0));
+    gLine.setAttribute("x2",X(x)); gLine.setAttribute("y2",Y(y));
+    gHalo.setAttribute("cx",X(x)); gHalo.setAttribute("cy",Y(y));
+    gDot.setAttribute("cx",X(x));  gDot.setAttribute("cy",Y(y));
+    gTag.setAttribute("x",X(x));   gTag.setAttribute("y",Y(y)-19);
+    gTag.textContent="x = "+num(x);
+    if(coreSel===0){
+      readEl.innerHTML="<i>x</i> = "+num(x)+" のとき　"+num(x)+"<sup>2</sup> − 7×"+num(x)
+        +" + 10 = "+num(x*x)+" − "+num(7*x)+" + 10 = <b>"+num(y)+"</b>";
+    }else{
+      readEl.innerHTML="<i>x</i> = "+num(x)+" のとき　("+num(x)+" − 2)("+num(x)+" − 5) = "
+        +par(u)+" × "+par(w)+" = <b>"+num(y)+"</b>";
+    }
+    var s;
+    if(Math.abs(u)<1e-9||Math.abs(w)<1e-9) s=["var(--teal)","片方が 0。だから、かけ算の答えも 0。"];
+    else if(x<2) s=["var(--amber)","どちらもマイナス。マイナス×マイナスで、答えはプラス。"];
+    else if(x<5) s=["var(--violet)","プラス×マイナス。2 と 5 のあいだだけ、答えがマイナスになる。"];
+    else s=["var(--amber)","どちらもプラス。答えもプラス。"];
+    signEl.style.color=s[0]; signEl.textContent=s[1];
+  }
+
   function pick(i,byUser){
     coreSel=i;
     faces.forEach(function(b,k){b.setAttribute("aria-selected",k===i?"true":"false");});
@@ -584,9 +676,12 @@ var coreSel=0, coreHL=[];
       "因数分解形が教えるのは、ゼロになる2点。帯の両端が x=2 と x=5。",
       "ゼロ点がわかれば、いちばん低い点もわかる。2 と 5 の真ん中 x=7/2 で、y は -9/4。"
     ][i];
+    drawCore();
     if(byUser){try{faces[i].focus({preventScroll:true});}catch(e){}}
   }
   faces.forEach(function(b){b.addEventListener("click",function(){pick(+b.dataset.face,true);});});
+  dragAlongX(svg,scInv(-1,8,58,432),0,7,0.5,function(){return cxv;},
+    function(v){cxv=v;drawCore();});
   pick(0);
   window.__corePick=pick;
 })();
@@ -655,6 +750,8 @@ var ball={raf:0,t:0,playing:false};
     })(t0);
   }
   btn.addEventListener("click",play);
+  dragAlongX(svg,scInv(0,4.6,150,436),0,4,0.02,
+    function(){return ball.t;},function(v){stop();set(v);});
   set(reduced?2:0);
   ball.stop=stop; ball.reset=function(){stop();set(reduced?2:0);};
 })();
@@ -733,6 +830,8 @@ var nfc={raf:0,phase:0};
     (function loop(){ nfc.phase+=0.14; draw(); nfc.raf=requestAnimationFrame(loop); })(); };
   nfc.stop=function(){ if(nfc.raf)cancelAnimationFrame(nfc.raf); nfc.raf=0; };
   slider.addEventListener("input",upd);
+  dragAlongX(svg,scInv(6,21,112,436),6,21,0.04,
+    function(){return +slider.value;},function(v){slider.value=v;upd();});
   upd(); draw();
 })();
 
@@ -801,7 +900,10 @@ var nfc={raf:0,phase:0};
       ? "当たる。天井は "+fmt(ceil,2)+" m しかない（"+fmt(-gap,2)+" m 不足）"
       : "通れる。天井までの余裕 "+fmt(gap,2)+" m";
   }
-  slider.addEventListener("input",upd); upd();
+  slider.addEventListener("input",upd);
+  dragAlongX(svg,scInv(-12,12,40,440),-8,8,0.05,
+    function(){return +slider.value;},function(v){slider.value=v;upd();});
+  upd();
 })();
 
 /* ══════════ 5. パン屋の利益 ══════════ */
@@ -857,7 +959,10 @@ var nfc={raf:0,phase:0};
       ? "赤字。利益 "+yen(p)+" 円／日"
       : (x===30 ? "最大。利益 9,800 円／日（これが答え）" : "利益 "+yen(p)+" 円／日");
   }
-  slider.addEventListener("input",upd); upd();
+  slider.addEventListener("input",upd);
+  dragAlongX(svg,scInv(-55,115,62,436),-45,105,1,
+    function(){return +slider.value;},function(v){slider.value=v;upd();});
+  upd();
 })();
 
 /* ══════════ 進行 ══════════ */
