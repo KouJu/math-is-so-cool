@@ -1,0 +1,936 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="description" content="展開・因数分解・式変形の意味を5分で伝える授業用スライド。力学・通信・インフラ・経済で y=0 を解く4つの実例つき。">
+<meta property="og:type" content="website">
+<meta property="og:title" content="式の中に隠れているもの">
+<meta property="og:description" content="展開・因数分解・式変形の意味を5分で伝える授業用スライド。力学・通信・インフラ・経済で y=0 を解く4つの実例つき。">
+<meta name="twitter:card" content="summary">
+
+<!-- ベースリセット -->
+<style>
+:root{color-scheme:light;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+body{margin:0;font-family:system-ui,-apple-system,sans-serif;font-size:14px}
+img{max-width:100%}
+[hidden]{display:none!important}
+</style>
+
+<title>式の中に隠れているもの</title>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Zen+Kaku+Gothic+New:wght@400;700;900&family=STIX+Two+Text:ital,wght@0,400;0,600;1,400;1,600&display=swap">
+<style>
+/* Layout: 全画面ステージ型。上に進行レール、中央に「言葉｜図」の2カラム（狭幅で縦積み）、下に操作バー。 */
+:root{
+  --bg:#F4F6F8;
+  --stage:#FFFFFF;
+  --sunk:#EAEEF2;
+  --ink:#131A21;
+  --ink-2:#4C5A66;
+  --ink-3:#8092A0;
+  --rule:#D5DDE4;
+  --rule-soft:#E6EBEF;
+  --amber:#9A5B04;      /* 展開形：出発点 */
+  --amber-soft:#F3DFBE;
+  --teal:#07695C;        /* 因数分解形：ゼロ点 */
+  --teal-soft:#C3E6DF;
+  --violet:#6B3098;      /* 平方完成形：頂点 */
+  --violet-soft:#E0D0F0;
+  --warn:#A8321E;
+  --curve:#2B3B49;
+  --font-ja:"Zen Kaku Gothic New",-apple-system,"Hiragino Kaku Gothic ProN","Noto Sans JP",sans-serif;
+  --font-math:"STIX Two Text","Times New Roman",serif;
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --bg:#0B1016; --stage:#131B23; --sunk:#0D141B; --ink:#E7EDF2; --ink-2:#A3B2BF;
+    --ink-3:#6E8192; --rule:#2A3742; --rule-soft:#1D262F;
+    --amber:#F0B45C; --amber-soft:#4A3414;
+    --teal:#4FD6BE; --teal-soft:#113D38;
+    --violet:#C49BF0; --violet-soft:#33204A;
+    --warn:#F0836B; --curve:#C8D6E2;
+    color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0B1016; --stage:#131B23; --sunk:#0D141B; --ink:#E7EDF2; --ink-2:#A3B2BF;
+  --ink-3:#6E8192; --rule:#2A3742; --rule-soft:#1D262F;
+  --amber:#F0B45C; --amber-soft:#4A3414;
+  --teal:#4FD6BE; --teal-soft:#113D38;
+  --violet:#C49BF0; --violet-soft:#33204A;
+  --warn:#F0836B; --curve:#C8D6E2;
+  color-scheme:dark;
+}
+
+*{box-sizing:border-box}
+html{height:100%}
+body{
+  margin:0;background:var(--bg);color:var(--ink);
+  display:flex;flex-direction:column;min-height:100%;
+  font-family:var(--font-ja);font-size:16px;line-height:1.7;
+  -webkit-font-smoothing:antialiased;
+  padding-left:max(16px,env(safe-area-inset-left,0px));
+  padding-right:max(16px,env(safe-area-inset-right,0px));
+  padding-block:0;
+}
+.wrap{max-width:1120px;width:100%;margin:0 auto;flex:1;display:flex;flex-direction:column}
+
+/* ───── 進行レール ───── */
+.rail{display:flex;align-items:center;gap:6px;padding-block:14px 10px;flex-wrap:wrap}
+.rail-title{font-size:.72rem;letter-spacing:.14em;color:var(--ink-3);margin-right:6px;white-space:nowrap}
+.step{appearance:none;border:1px solid var(--rule);background:transparent;color:var(--ink-3);
+  font-family:inherit;font-size:.74rem;padding:3px 9px;border-radius:999px;cursor:pointer;
+  display:flex;align-items:center;gap:5px;transition:.18s}
+.step:hover{border-color:var(--ink-3);color:var(--ink-2)}
+.step .n{font-variant-numeric:tabular-nums;opacity:.6}
+.step[aria-current="true"]{background:var(--ink);border-color:var(--ink);color:var(--stage);font-weight:700}
+.step[aria-current="true"] .n{opacity:.7}
+.step .lbl{display:none}
+@media (min-width:760px){.step .lbl{display:inline}}
+.rail-right{margin-left:auto;display:flex;gap:6px}
+.iconbtn{appearance:none;border:1px solid var(--rule);background:transparent;color:var(--ink-2);
+  font-family:inherit;font-size:.74rem;padding:3px 10px;border-radius:999px;cursor:pointer;transition:.18s}
+.iconbtn:hover{border-color:var(--ink-3);color:var(--ink)}
+.iconbtn[aria-pressed="true"]{background:var(--sunk);border-color:var(--ink-3);color:var(--ink)}
+
+/* ───── ステージ ───── */
+.stage{background:var(--stage);border:1px solid var(--rule-soft);border-radius:4px;
+  padding:clamp(18px,3.4vw,38px);flex:1;position:relative;overflow:hidden}
+.scene{animation:rise .42s cubic-bezier(.2,.7,.3,1) both}
+@keyframes rise{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+@media (prefers-reduced-motion:reduce){.scene{animation:none}}
+
+.eyebrow{font-size:.72rem;letter-spacing:.17em;color:var(--ink-3);margin:0 0 .5em}
+h1{font-size:clamp(1.55rem,4.3vw,2.6rem);font-weight:900;line-height:1.32;margin:0 0 .5em;
+  letter-spacing:.01em;text-wrap:balance}
+h2{font-size:clamp(1.3rem,3.1vw,1.9rem);font-weight:900;line-height:1.38;margin:0 0 .45em;text-wrap:balance}
+h3{font-size:1rem;font-weight:700;margin:0 0 .3em}
+p{margin:0 0 .85em;max-width:34em}
+.lede{font-size:1.02rem;color:var(--ink-2)}
+.small{font-size:.86rem;color:var(--ink-2)}
+.tag{display:inline-block;font-size:.7rem;letter-spacing:.13em;padding:2px 8px;border-radius:3px;
+  background:var(--sunk);color:var(--ink-2);border:1px solid var(--rule-soft)}
+
+/* 数式 */
+.eq{font-family:var(--font-math);font-feature-settings:"ss01";line-height:1.45}
+.eq i,i.v{font-family:var(--font-math);font-style:italic}
+sup{font-size:.68em}
+.hero-eq{font-family:var(--font-math);font-size:clamp(2.3rem,9.5vw,5rem);line-height:1.1;margin:.3em 0 .55em}
+.hero-eq i{font-style:italic}
+
+/* 2カラム */
+.cols{display:grid;grid-template-columns:1fr;gap:clamp(18px,2.6vw,34px);align-items:start}
+@media (min-width:900px){.cols{grid-template-columns:minmax(0,0.9fr) minmax(0,1.1fr)}}
+.cols>*{min-width:0}
+
+figure{margin:0}
+figcaption{font-size:.8rem;color:var(--ink-3);margin-top:.5em;line-height:1.55}
+svg.plot{width:100%;max-width:100%;height:auto;display:block}
+
+/* SVG 共通クラス */
+.grid-l{stroke:var(--rule-soft);stroke-width:1}
+.axis{stroke:var(--ink-3);stroke-width:1.3}
+.tick{fill:var(--ink-3);font-size:11px;font-family:var(--font-math)}
+.curve{fill:none;stroke:var(--curve);stroke-width:2.6;stroke-linecap:round}
+.dash{stroke-dasharray:4 4;stroke-width:1.4;fill:none}
+.lab{font-size:12.5px;font-weight:700;font-family:var(--font-ja)}
+.lab-m{font-size:13px;font-family:var(--font-math)}
+.dot{stroke:var(--stage);stroke-width:2.4}
+.pulse{animation:pl 1.9s ease-out infinite}
+@keyframes pl{0%{r:7;opacity:.5}70%{r:17;opacity:0}100%{opacity:0}}
+@media (prefers-reduced-motion:reduce){.pulse{animation:none;opacity:0}}
+
+/* 顔スイッチャー */
+.faces{display:flex;flex-direction:column;gap:8px;margin:0 0 16px}
+.face{appearance:none;text-align:left;width:100%;cursor:pointer;font-family:inherit;
+  border:1px solid var(--rule);background:transparent;border-radius:4px;padding:11px 14px;
+  display:grid;grid-template-columns:auto 1fr;gap:3px 11px;align-items:center;transition:.2s;color:var(--ink-2)}
+.face:hover{border-color:var(--ink-3)}
+.face .nm{font-size:.72rem;letter-spacing:.12em;grid-column:1;white-space:nowrap}
+.face .ex{font-family:var(--font-math);font-size:1.12rem;grid-column:2;color:var(--ink)}
+.face .ex i{font-style:italic}
+.face .gain{grid-column:1/-1;font-size:.82rem;display:none;line-height:1.6}
+.face[aria-selected="true"]{background:var(--sw-soft);border-color:var(--sw);color:var(--sw)}
+.face[aria-selected="true"] .nm{font-weight:700}
+.face[aria-selected="true"] .gain{display:block;color:var(--ink-2)}
+#f0{--sw:var(--amber);--sw-soft:var(--amber-soft)}
+#f1{--sw:var(--teal);--sw-soft:var(--teal-soft)}
+#f2{--sw:var(--violet);--sw-soft:var(--violet-soft)}
+
+/* 本質テーブル */
+.essence{width:100%;border-collapse:collapse;margin:6px 0 18px;font-size:clamp(.92rem,2.2vw,1.05rem)}
+.essence th,.essence td{text-align:left;padding:14px 12px;border-bottom:1px solid var(--rule-soft);vertical-align:top}
+.essence thead th{font-size:.7rem;letter-spacing:.14em;color:var(--ink-3);font-weight:700;padding-bottom:7px}
+.essence tbody th{font-weight:900;white-space:nowrap;width:1%;font-size:1.05em}
+.essence tbody tr:nth-child(1) th{color:var(--amber)}
+.essence tbody tr:nth-child(2) th{color:var(--teal)}
+.essence tbody tr:nth-child(3) th{color:var(--violet)}
+.tbl-scroll{overflow-x:auto}
+
+/* 操作系 */
+.ctrl{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin:14px 0 6px}
+.ctrl label{font-size:.8rem;color:var(--ink-2);white-space:nowrap}
+input[type=range]{flex:1;min-width:150px;accent-color:var(--teal);height:22px}
+.readout{font-family:var(--font-math);font-variant-numeric:tabular-nums;font-size:1.05rem;
+  background:var(--sunk);border:1px solid var(--rule-soft);border-radius:3px;padding:3px 9px;white-space:nowrap}
+.readout b{font-weight:600}
+.btn{appearance:none;cursor:pointer;font-family:inherit;font-weight:700;font-size:.9rem;
+  border:1px solid var(--ink);background:var(--ink);color:var(--stage);border-radius:3px;padding:8px 16px;transition:.18s}
+.btn:hover{opacity:.84}
+.btn.ghost{background:transparent;color:var(--ink);border-color:var(--rule)}
+.btn.ghost:hover{border-color:var(--ink);opacity:1}
+.btn.big{font-size:1rem;padding:12px 22px}
+
+/* 読み取りカード */
+.reads{display:grid;gap:9px;margin:4px 0 0}
+.read{display:grid;grid-template-columns:auto 1fr;gap:10px;align-items:baseline;
+  border-left:3px solid var(--rd,var(--rule));padding:4px 0 4px 11px}
+.read .k{font-family:var(--font-math);font-size:.98rem;color:var(--rd,var(--ink-2));white-space:nowrap}
+.read .t{font-size:.88rem;color:var(--ink-2);line-height:1.6}
+.punch{border-top:1px solid var(--rule-soft);margin-top:18px;padding-top:16px;
+  font-size:clamp(1rem,2.5vw,1.2rem);font-weight:700;line-height:1.65;max-width:30em}
+.statebox{font-size:.92rem;border:1px solid var(--rule);border-radius:4px;padding:10px 13px;
+  background:var(--sunk);line-height:1.6}
+.statebox.hit{border-color:var(--warn);color:var(--warn);background:transparent}
+.statebox.ok{border-color:var(--teal);color:var(--teal);background:transparent}
+
+/* 指導メモ */
+.note{border:1px dashed var(--rule);border-radius:4px;padding:13px 15px;margin-top:20px;
+  font-size:.88rem;color:var(--ink-2);line-height:1.7;background:var(--sunk)}
+.note b{color:var(--ink);font-size:.76rem;letter-spacing:.13em;display:block;margin-bottom:.35em}
+
+/* 締め */
+.closing{display:flex;flex-direction:column;gap:18px;margin:6px 0 4px}
+blockquote{margin:0;padding:18px 0 18px 20px;border-left:4px solid var(--teal);
+  font-size:clamp(1.05rem,2.9vw,1.42rem);font-weight:700;line-height:1.6;max-width:30em}
+blockquote:last-of-type{border-left-color:var(--violet)}
+.recap{display:grid;gap:10px;grid-template-columns:1fr;margin:4px 0 0}
+@media (min-width:680px){.recap{grid-template-columns:1fr 1fr}}
+.rc{border:1px solid var(--rule-soft);border-radius:4px;padding:11px 13px}
+.rc .rt{font-size:.72rem;letter-spacing:.12em;color:var(--ink-3)}
+.rc .rm{font-family:var(--font-math);font-size:1.12rem;margin:2px 0 1px}
+.rc .rm i{font-style:italic}
+.rc .rd{font-size:.82rem;color:var(--ink-2);line-height:1.55}
+
+/* 下部ナビ */
+.nav{position:sticky;bottom:0;background:linear-gradient(to top,var(--bg) 62%,transparent);
+  display:flex;align-items:center;gap:10px;padding-block:14px 16px;margin-top:4px}
+.nav .spacer{flex:1}
+.nav .where{font-size:.76rem;color:var(--ink-3);font-variant-numeric:tabular-nums;white-space:nowrap}
+.btn[disabled]{opacity:.32;cursor:default}
+.hint{font-size:.72rem;color:var(--ink-3);text-align:center;padding-bottom:10px}
+:focus-visible{outline:2px solid var(--teal);outline-offset:2px}
+</style>
+</head>
+<body>
+<div class="wrap">
+<nav class="rail" aria-label="進行">
+  <span class="rail-title">5分の流れ</span>
+  <div id="steps" style="display:flex;gap:6px;flex-wrap:wrap"></div>
+  <div class="rail-right">
+    <button class="iconbtn" id="noteBtn" aria-pressed="false">指導メモ</button>
+    <button class="iconbtn" id="fsBtn">全画面</button>
+  </div>
+</nav>
+
+<main class="stage" id="stage">
+
+<!-- ═══ 1 ═══ -->
+<section class="scene" id="sc0">
+  <p class="eyebrow">展開と因数分解は、なんのためにあるのか</p>
+  <h1>式の中には、<br>情報が隠れている</h1>
+  <div class="hero-eq" id="heroEq"><i>y</i> = <i>x</i><sup>2</sup> − 7<i>x</i> + 10</div>
+  <p class="lede">この式を見て、わかることはありますか。<br>
+  ——ほとんど何もわかりません。それが正常です。式は、情報を<b>隠した状態</b>で置かれているからです。</p>
+  <p class="small">「展開せよ」「因数分解せよ」は、作業の指示に見えます。でも本当にやっているのは、
+  隠されている情報を<b>取り出す操作</b>です。この同じ式から、3つの情報を引き出してみます。</p>
+  <p style="margin-top:22px"><button class="btn big" data-go="1">隠れているものを見にいく →</button></p>
+  <div class="note" hidden>
+    <b>指導メモ・約20秒</b>
+    式だけを見せて「これ、何がわかる?」と聞く。「わからない」が返ってきたら勝ち。
+    「わからないのが当たり前。式は情報を隠しているからね」と受けて次へ。ここで答えを言わない。
+  </div>
+</section>
+
+<!-- ═══ 2 ═══ -->
+<section class="scene" id="sc1" hidden>
+  <p class="eyebrow">核心</p>
+  <h2>同じ式から、3つの情報</h2>
+  <div class="cols">
+    <div>
+      <p class="small" style="margin-bottom:14px">クリックして、順に切り替えてみてください。</p>
+      <div class="faces" role="tablist" aria-label="式から読み取れる3つの情報">
+        <button class="face" id="f0" role="tab" aria-selected="true" data-face="0">
+          <span class="nm">展開形</span>
+          <span class="ex"><i>y</i> = <i>x</i><sup>2</sup> − 7<i>x</i> + 10</span>
+          <span class="gain">わかるのは<b>出発点</b>。<i class="v">x</i>=0 を入れると答えは定数項の 10。グラフが縦軸を通る高さが、ひと目で読める。</span>
+        </button>
+        <button class="face" id="f1" role="tab" aria-selected="false" data-face="1">
+          <span class="nm">因数分解形</span>
+          <span class="ex"><i>y</i> = (<i>x</i> − 2)(<i>x</i> − 5)</span>
+          <span class="gain">わかるのは<b>ゼロになる場所</b>。かけ算が 0 になるのは、どちらかが 0 のときだけ。だから <i class="v">x</i>=2 と <i class="v">x</i>=5。計算は一切していない。</span>
+        </button>
+        <button class="face" id="f2" role="tab" aria-selected="false" data-face="2">
+          <span class="nm">もう一歩</span>
+          <span class="ex"><i>x</i> = (2 + 5) ÷ 2 = <sup>7</sup>⁄<sub>2</sub></span>
+          <span class="gain">放物線は左右対称。だから<b>いちばん低い点は、2つのゼロ点のちょうど真ん中</b>。その <i class="v">x</i> を因数分解形にもう一度入れると <i class="v">y</i> = <sup>3</sup>⁄<sub>2</sub> × (−<sup>3</sup>⁄<sub>2</sub>) = −<sup>9</sup>⁄<sub>4</sub>。新しい公式は、いらない。</span>
+        </button>
+      </div>
+      <div class="punch" id="corePunch">式は1文字も増えていない。グラフは1ミリも動いていない。<br>
+        変わったのは、<span style="color:var(--teal)">見えている情報</span>だけ。</div>
+    </div>
+    <figure>
+      <svg class="plot" id="coreSvg" viewBox="0 0 470 340" role="img"
+        aria-label="y = x の2乗 − 7x + 10 のグラフ。展開形は縦軸との交点10、因数分解形は x=2 と x=5、3つめは2つのゼロ点の真ん中にある最低点(3.5, −2.25)を示す。"></svg>
+      <figcaption id="coreCap">3つの形はすべて同じ曲線を描く。形を選ぶと、その形が教えてくれる点が光る。</figcaption>
+    </figure>
+  </div>
+  <div class="note" hidden>
+    <b>指導メモ・約60秒</b>
+    ここが山場。3つを順に押して、<b>グラフが変わらないこと</b>を声に出して確認する。
+    「式変形は、グラフを変える操作じゃない。同じものを別の角度から見る操作なんだ」。
+    グラフは見せるだけでよく、描かせる必要はない（中3で扱うのは <i>y</i> = <i>ax</i><sup>2</sup> まで）。
+    3つめは平方完成ではなく、放物線の左右対称だけを使っている。「高校ではこれが『平方完成』という1つの形になる」と予告だけしておくと接続がよい。
+    「じゃあ、ゼロになる場所がわかると何が嬉しいの?」と問いを残して次へ。
+  </div>
+</section>
+
+<!-- ═══ 3 ═══ -->
+<section class="scene" id="sc2" hidden>
+  <p class="eyebrow">3つの操作の、ほんとうの意味</p>
+  <h2>何をしている操作なのか</h2>
+  <div class="tbl-scroll">
+  <table class="essence">
+    <thead><tr><th>数学の操作</th><th>その本質</th><th>そのとき手に入るもの</th></tr></thead>
+    <tbody>
+      <tr><th>展開</th><td>まとまった構造を<b>ばらして調べる</b></td><td>各項の重み、出発点、次数</td></tr>
+      <tr><th>因数分解</th><td>バラバラの情報から<b>構造を見つける</b></td><td>ゼロになる場所、境界、そのあいだ</td></tr>
+      <tr><th>式変形</th><td>同じものを<b>別の視点から眺める</b></td><td>その場面で知りたい情報</td></tr>
+    </tbody>
+  </table>
+  </div>
+  <p class="lede">このうち、現場でいちばん値段がつくのは <b style="color:var(--teal)">因数分解</b> です。<br>
+  なぜなら「<span class="eq"><i>y</i> = 0</span> になる <span class="eq"><i>x</i></span> を知りたい」という形の問題が、世の中に大量にあるからです。</p>
+  <p class="small">これから4つ見せます。ボール、交通系ICカード、トンネル、パン屋。<br>
+  分野はまったく違うのに、聞かれていることは全部同じです。<span class="eq"><i>y</i> = 0</span> になるのはどこか。</p>
+  <p style="margin-top:20px"><button class="btn" data-go="3">1つめ・ボールを投げる →</button></p>
+  <div class="note" hidden>
+    <b>指導メモ・約30秒</b>
+    表は読み上げるだけでよい。大事なのは最後の一行。
+    「<i>y</i>=0 を知りたい場面が世の中に山ほどある」——ここで生徒の姿勢が変わる。4つの例は速いテンポで。
+  </div>
+</section>
+
+<!-- ═══ 4 ═══ -->
+<section class="scene" id="sc3" hidden>
+  <p class="eyebrow">① 力学 ／ 身のまわりの運動</p>
+  <h2>ボールは、いつ地面にもどるか</h2>
+  <div class="cols">
+    <div>
+      <p class="small">秒速 20 m で真上に投げたボールの高さは、<span class="eq"><i>h</i> = 20<i>t</i> − 5<i>t</i><sup>2</sup></span>（<span class="eq"><i>t</i></span> は秒、単位は m）。<br>
+      地面にもどる瞬間は「高さが 0」、つまり <span class="eq"><i>h</i> = 0</span> です。</p>
+      <div class="reads">
+        <div class="read" style="--rd:var(--ink-3)"><span class="k">20<i>t</i> − 5<i>t</i><sup>2</sup> = 0</span><span class="t">このままでは、答えは見えない</span></div>
+        <div class="read" style="--rd:var(--teal)"><span class="k">5<i>t</i>(4 − <i>t</i>) = 0</span><span class="t">くくり出すだけで <i class="v">t</i> = 0（投げた瞬間）と <i class="v">t</i> = 4（落ちた瞬間）</span></div>
+        <div class="read" style="--rd:var(--violet)"><span class="k"><i>t</i> = (0+4)/2 = 2</span><span class="t">おまけ：2つのゼロ点の<b>ちょうど真ん中</b>が最高点。だから 2 秒後、高さ 20 m</span></div>
+      </div>
+      <div class="ctrl">
+        <button class="btn" id="ballPlay">投げる</button>
+        <span class="readout" id="ballRead"><b><i>t</i></b> = 0.00 s　<b><i>h</i></b> = 0.0 m</span>
+      </div>
+      <div class="punch">解の公式は、使っていない。<br>因数分解できた瞬間に、答えは<span style="color:var(--teal)">読むだけ</span>になった。</div>
+    </div>
+    <figure>
+      <svg class="plot" id="ballSvg" viewBox="0 0 470 340" role="img"
+        aria-label="高さと時間のグラフ。放物線は t=0 と t=4 で高さ0と交わり、t=2 で最高点20mに達する。左側の柱でボールの実際の高さが同時に動く。"></svg>
+      <figcaption>左の柱が実際のボールの高さ。右の放物線は同じ運動を「時間 対 高さ」で描いたもの。曲線が地面の線を切る2点が、因数分解で出た 0 と 4。</figcaption>
+    </figure>
+  </div>
+  <div class="note" hidden>
+    <b>指導メモ・約50秒</b>
+    「投げる」を押しながら、t=4 でボールが地面に着くのを指さす。
+    <b>2つのゼロ点の真ん中が頂点</b>——この一点だけは板書する。あとの3つの例でも同じ道具が効くので、伏線になる。
+  </div>
+</section>
+
+<!-- ═══ 5 ═══ -->
+<section class="scene" id="sc4" hidden>
+  <p class="eyebrow">② 情報通信機器 ／ 電波をつかまえる</p>
+  <h2>ICカードが反応する周波数</h2>
+  <div class="cols">
+    <div>
+      <p class="small">改札にかざすカードの中には、コイルとコンデンサだけの小さな回路が入っています。
+      この回路は、ある1つの周波数のときだけ電流が大きく振れ、そこで電力をもらって動きます。
+      その条件が、<b>ある式がちょうど 0 になること</b>です。</p>
+      <div class="reads">
+        <div class="read" style="--rd:var(--ink-3)"><span class="k">1 − (<i>f</i>/13.56)<sup>2</sup> = 0</span><span class="t">共振の条件（<i class="v">f</i> の単位は MHz）</span></div>
+        <div class="read" style="--rd:var(--teal)"><span class="k">(1 − <sup><i>f</i></sup>⁄<sub>13.56</sub>)(1 + <sup><i>f</i></sup>⁄<sub>13.56</sub>) = 0</span><span class="t">教科書どおりの <b><i>a</i><sup>2</sup> − <i>b</i><sup>2</sup> = (<i>a</i>−<i>b</i>)(<i>a</i>+<i>b</i>)</b>。和と差の積</span></div>
+        <div class="read" style="--rd:var(--violet)"><span class="k"><i>f</i> = 13.56 MHz</span><span class="t">負の解は周波数としてありえないので捨てる。残った1つが世界共通の規格値</span></div>
+      </div>
+      <div class="ctrl">
+        <label for="freq">周波数</label>
+        <input type="range" id="freq" min="6" max="21" step="0.04" value="8.6">
+        <span class="readout" id="freqRead"><b><i>f</i></b> = 8.60 MHz</span>
+      </div>
+      <div class="statebox" id="nfcState">まだ反応しない。式の値が 0 から離れている。</div>
+      <div class="punch">因数分解は、設計図そのもの。<br>「<span style="color:var(--teal)">0 になる <i>f</i></span>」を決めることが、部品の値を決めることだった。</div>
+    </div>
+    <figure>
+      <svg class="plot" id="nfcSvg" viewBox="0 0 470 340" role="img"
+        aria-label="上段はカードに流れる電流の波。周波数を13.56MHzに合わせると振幅が急に大きくなりカードが点灯する。下段は応答の大きさの曲線で、13.56MHzに鋭い山がある。"></svg>
+      <figcaption>スライダーを動かすと、波の振れ幅が変わる。13.56 MHz で式の値が 0 になり、そこだけ急に大きく振れてカードが起きる。これが「かざすと鳴る」の中身。</figcaption>
+    </figure>
+  </div>
+  <div class="note" hidden>
+    <b>指導メモ・約40秒</b>
+    自分の交通系ICカードを出して見せると効く。スライダーをゆっくり通過させて、点灯する幅の狭さを体感させる。
+    「和と差の積って、これのためにあったの?」という反応が出たら成功。
+  </div>
+</section>
+
+<!-- ═══ 6 ═══ -->
+<section class="scene" id="sc5" hidden>
+  <p class="eyebrow">③ インフラ管理 ／ 通れるかどうか</p>
+  <h2>トンネルの、通れる幅</h2>
+  <div class="cols">
+    <div>
+      <p class="small">放物線のアーチで断面をつくったトンネル。中心の高さを 6 m として、断面は
+      <span class="eq"><i>y</i> = 6 − 0.06<i>x</i><sup>2</sup></span>（<span class="eq"><i>x</i></span> は中心からの距離、m）。</p>
+      <div class="reads">
+        <div class="read" style="--rd:var(--teal)"><span class="k">6 − 0.06<i>x</i><sup>2</sup> = 0.06(10 − <i>x</i>)(10 + <i>x</i>)</span><span class="t">0 になるのは <i class="v">x</i> = ±10。トンネルの<b>幅は 20 m</b></span></div>
+        <div class="read" style="--rd:var(--violet)"><span class="k">6 − 0.06<i>x</i><sup>2</sup> = 4.1</span><span class="t">高さ 4.1 m のトラックが当たらない境界は <i class="v">x</i> = ±5.63。車体の幅を足すと、走れるのは中心から ±4.38 m まで</span></div>
+      </div>
+      <div class="ctrl">
+        <label for="pos">トラックの位置</label>
+        <input type="range" id="pos" min="-8" max="8" step="0.05" value="0">
+        <span class="readout" id="posRead"><b><i>x</i></b> = 0.00 m</span>
+      </div>
+      <div class="statebox ok" id="tunState">通れる。天井までの余裕 1.90 m</div>
+      <div class="punch">道路の車線が中央寄りにあるのは、デザインではない。<br>この<span style="color:var(--teal)">式が出した境界</span>そのもの。</div>
+    </div>
+    <figure>
+      <svg class="plot" id="tunSvg" viewBox="0 0 470 340" role="img"
+        aria-label="放物線アーチのトンネル断面図。トラックを横に動かすと、端に寄るほど天井が低くなり、中心から約4.4mを超えると屋根が当たる。"></svg>
+      <figcaption>アーチが地面に着く 2 点が <span class="eq"><i>y</i> = 0</span> の解。トラックを端に寄せていくと、どこで当たるかも同じ式が教える。点検・通行許可・高さ制限の標識は、全部この計算の結果。</figcaption>
+    </figure>
+  </div>
+  <div class="note" hidden>
+    <b>指導メモ・約40秒</b>
+    トラックを端まで動かして当てて見せる。「大型車が通れる道かどうかを、現場で毎日この式で判断している」。
+    <i>y</i>=0 だけでなく <i>y</i>=4.1 も同じ技で解けると添えると、応用の広さが伝わる。
+  </div>
+</section>
+
+<!-- ═══ 7 ═══ -->
+<section class="scene" id="sc6" hidden>
+  <p class="eyebrow">④ 経済・金融 ／ もうかる値段</p>
+  <h2>パンを、何円値上げするか</h2>
+  <div class="cols">
+    <div>
+      <p class="small">1個 100 円のパンが 1日 200 個売れる店。原価は 60 円。
+      調査すると、<b>1円値上げするごとに 2 個売れなくなる</b>とわかった。<span class="eq"><i>x</i></span> 円値上げしたときの1日の利益は——</p>
+      <div class="reads">
+        <div class="read" style="--rd:var(--ink-3)"><span class="k">(40 + <i>x</i>)(200 − 2<i>x</i>)</span><span class="t">1個の利益 × 売れる個数</span></div>
+        <div class="read" style="--rd:var(--teal)"><span class="k">= 2(40 + <i>x</i>)(100 − <i>x</i>)</span><span class="t">0 になるのは <i class="v">x</i> = −40（原価と同じ値段）と <i class="v">x</i> = 100（高すぎて誰も買わない）。<b>この間だけが黒字</b></span></div>
+        <div class="read" style="--rd:var(--violet)"><span class="k"><i>x</i> = (−40 + 100)/2 = 30</span><span class="t">真ん中が最大。<b>130 円が最適</b>で、利益は 9,800 円。ボールの最高点と、まったく同じ理屈</span></div>
+      </div>
+      <div class="ctrl">
+        <label for="price">値上げ額</label>
+        <input type="range" id="price" min="-45" max="105" step="1" value="0">
+        <span class="readout" id="priceRead"><b>100 円</b>・200 個</span>
+      </div>
+      <div class="statebox" id="profState">利益 8,000 円／日</div>
+      <div class="punch">因数分解が出した2つのゼロ点は、<br><span style="color:var(--teal)">赤字と黒字の境界線</span>だった。そして真ん中が、答え。</div>
+    </div>
+    <figure>
+      <svg class="plot" id="profSvg" viewBox="0 0 470 340" role="img"
+        aria-label="値上げ額と1日の利益の放物線。x=−40 と x=100 で利益が0になり、その間が黒字の帯。x=30 で最大の9800円。"></svg>
+      <figcaption>帯が黒字ゾーン。両端はどちらも利益 0 で、意味はまるで違う（安すぎる／高すぎる）。
+      投資の利回り（IRR）や損益分岐点も、立式すればこれと同じ二次方程式になる。</figcaption>
+    </figure>
+  </div>
+  <div class="note" hidden>
+    <b>指導メモ・約50秒</b>
+    スライダーを値下げ方向にも振って、赤字に落ちるのを見せる。
+    「2つのゼロ点の真ん中が最大」がボールと同じだと気づかせたい。ここで4つの例が1本につながる。
+  </div>
+</section>
+
+<!-- ═══ 8 ═══ -->
+<section class="scene" id="sc7" hidden>
+  <p class="eyebrow">まとめ</p>
+  <h2>今日使った道具は、たった2つ</h2>
+  <div class="recap">
+    <div class="rc"><div class="rt">道具 1</div><div class="rm">(<i>x</i> − <i>a</i>)(<i>x</i> − <i>b</i>) = 0</div>
+      <div class="rd">ボールの落下時刻／パン屋の黒字の両端。そして、2つの解の真ん中が頂点。</div></div>
+    <div class="rc"><div class="rt">道具 2</div><div class="rm"><i>a</i><sup>2</sup> − <i>b</i><sup>2</sup> = (<i>a</i> − <i>b</i>)(<i>a</i> + <i>b</i>)</div>
+      <div class="rd">ICカードの共振周波数／トンネルの幅。和と差の積、そのまま。</div></div>
+  </div>
+  <p class="small" style="margin-top:16px">この2つだけで、落ちてくるボールも、改札のカードも、トンネルの高さ制限も、パンの値段も解けました。
+  覚える公式が増えたわけではありません。<b>式を見る目</b>が変わっただけです。</p>
+  <div class="closing">
+    <blockquote>式変形は、答えを出すための作業ではなく、式の中に隠れている情報を取り出すための技。</blockquote>
+    <blockquote>数学って、単に計算を早くこなす単調な作業ではない。どうやったら問題をより簡単に捉えなおせるか、どうやったら隠れている仕組みを見つけられるかを見つけられる魔法。</blockquote>
+  </div>
+  <p style="margin-top:18px"><button class="btn ghost" data-go="0">はじめに戻る</button></p>
+  <div class="note" hidden>
+    <b>指導メモ・約30秒</b>
+    2つの言葉はゆっくり。読み上げたあと3秒黙ると残る。
+    続けて演習に入るなら「今日の問題、まず式を眺めて、何が隠れていそうか言ってから解こう」と渡すと、作業感が消える。
+  </div>
+</section>
+
+</main>
+
+<div class="nav">
+  <button class="btn ghost" id="prev">← 前</button>
+  <span class="where" id="where">1 / 8</span>
+  <span class="spacer"></span>
+  <button class="btn" id="next">次 →</button>
+</div>
+<p class="hint">← → キーでも進めます</p>
+</div>
+
+<script>
+(function(){
+"use strict";
+var SVGNS="http://www.w3.org/2000/svg";
+var reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+function el(n,a,txt){var e=document.createElementNS(SVGNS,n);for(var k in a)e.setAttribute(k,a[k]);
+  if(txt!=null)e.textContent=txt;return e;}
+function sc(d0,d1,r0,r1){var m=(r1-r0)/(d1-d0);return function(v){return r0+(v-d0)*m;};}
+function fpath(f,X,Y,x0,x1,n){var d="",i,x;n=n||220;
+  for(i=0;i<=n;i++){x=x0+(x1-x0)*i/n;d+=(i?"L":"M")+X(x).toFixed(2)+" "+Y(f(x)).toFixed(2);}return d;}
+function fmt(v,n){return v.toFixed(n);}
+function yen(v){return Math.round(v).toLocaleString("ja-JP");}
+
+/* ══════════ 1. 3つの顔 ══════════ */
+var coreSel=0, coreHL=[];
+(function(){
+  var svg=document.getElementById("coreSvg");
+  var X=sc(-1,8,58,432), Y=sc(-4,12,290,36);
+  var f=function(x){return x*x-7*x+10;};
+  var cid="coreClip";
+  var defs=el("defs");
+  var cp=el("clipPath",{id:cid});
+  cp.appendChild(el("rect",{x:58,y:30,width:374,height:266}));
+  defs.appendChild(cp); svg.appendChild(defs);
+
+  var g=el("g"),i;
+  for(i=-1;i<=8;i++) g.appendChild(el("line",{x1:X(i),y1:36,x2:X(i),y2:290,"class":"grid-l"}));
+  for(i=-4;i<=12;i+=2) g.appendChild(el("line",{x1:58,y1:Y(i),x2:432,y2:Y(i),"class":"grid-l"}));
+  svg.appendChild(g);
+  svg.appendChild(el("line",{x1:58,y1:Y(0),x2:436,y2:Y(0),"class":"axis"}));
+  svg.appendChild(el("line",{x1:X(0),y1:30,x2:X(0),y2:296,"class":"axis"}));
+  for(i=1;i<=7;i++) svg.appendChild(el("text",{x:X(i),y:Y(0)+16,"class":"tick","text-anchor":"middle"},String(i)));
+  [2,4,6,8,10,12].forEach(function(v){
+    svg.appendChild(el("text",{x:X(0)-8,y:Y(v)+4,"class":"tick","text-anchor":"end"},String(v)));});
+  svg.appendChild(el("text",{x:X(0)-8,y:Y(-2)+4,"class":"tick","text-anchor":"end"},"-2"));
+  svg.appendChild(el("text",{x:438,y:Y(0)+4,"class":"tick"},"x"));
+  svg.appendChild(el("text",{x:X(0)-6,y:26,"class":"tick","text-anchor":"middle"},"y"));
+
+  var shade=el("path",{d:fpath(f,X,Y,2,5,60)+"L"+X(5)+" "+Y(0)+"L"+X(2)+" "+Y(0)+"Z",
+    fill:"var(--teal-soft)",opacity:.75,"clip-path":"url(#"+cid+")"});
+  shade.setAttribute("id","coreShade"); shade.setAttribute("visibility","hidden");
+  svg.appendChild(shade);
+  svg.appendChild(el("path",{d:fpath(f,X,Y,-1,8),"class":"curve","clip-path":"url(#"+cid+")"}));
+
+  /* 展開形：y切片 */
+  var A=el("g",{id:"hlA"});
+  A.appendChild(el("line",{x1:X(0),y1:Y(10),x2:X(1.9),y2:Y(10),"class":"dash",stroke:"var(--amber)"}));
+  A.appendChild(el("circle",{cx:X(0),cy:Y(10),r:7,fill:"none",stroke:"var(--amber)","class":"pulse"}));
+  A.appendChild(el("circle",{cx:X(0),cy:Y(10),r:6,fill:"var(--amber)","class":"dot"}));
+  A.appendChild(el("text",{x:X(2.1),y:Y(10)-4,"class":"lab",fill:"var(--amber)"},"出発点"));
+  A.appendChild(el("text",{x:X(2.1),y:Y(10)+13,"class":"lab-m",fill:"var(--amber)"},"(0, 10) ← 定数項"));
+  svg.appendChild(A);
+
+  /* 因数分解形：ゼロ点 */
+  var B=el("g",{id:"hlB"});
+  [[2,"x = 2"],[5,"x = 5"]].forEach(function(p){
+    B.appendChild(el("circle",{cx:X(p[0]),cy:Y(0),r:7,fill:"none",stroke:"var(--teal)","class":"pulse"}));
+    B.appendChild(el("circle",{cx:X(p[0]),cy:Y(0),r:6,fill:"var(--teal)","class":"dot"}));
+    B.appendChild(el("text",{x:X(p[0]),y:Y(0)-14,"class":"lab-m",fill:"var(--teal)","text-anchor":"middle"},p[1]));
+  });
+  B.appendChild(el("text",{x:X(3.5),y:Y(-3.4),"class":"lab",fill:"var(--teal)","text-anchor":"middle"},"y = 0 になる2点"));
+  svg.appendChild(B);
+
+  /* もう一歩：2つのゼロ点の真ん中が、いちばん低い点 */
+  var C=el("g",{id:"hlC"});
+  [2,5].forEach(function(r){
+    C.appendChild(el("circle",{cx:X(r),cy:Y(0),r:5,fill:"var(--teal)","class":"dot"}));});
+  C.appendChild(el("line",{x1:X(2),y1:Y(1.2),x2:X(5),y2:Y(1.2),stroke:"var(--violet)","stroke-width":1.4}));
+  [2,3.5,5].forEach(function(t){
+    C.appendChild(el("line",{x1:X(t),y1:Y(0.85),x2:X(t),y2:Y(1.55),stroke:"var(--violet)","stroke-width":1.4}));});
+  C.appendChild(el("text",{x:X(3.5),y:Y(1.55)-9,"class":"lab",fill:"var(--violet)","text-anchor":"middle"},"2 と 5 の真ん中"));
+  C.appendChild(el("line",{x1:X(3.5),y1:Y(1.2),x2:X(3.5),y2:Y(-2.25),"class":"dash",stroke:"var(--violet)"}));
+  C.appendChild(el("line",{x1:X(0),y1:Y(-2.25),x2:X(3.5),y2:Y(-2.25),"class":"dash",stroke:"var(--violet)"}));
+  C.appendChild(el("circle",{cx:X(3.5),cy:Y(-2.25),r:7,fill:"none",stroke:"var(--violet)","class":"pulse"}));
+  C.appendChild(el("circle",{cx:X(3.5),cy:Y(-2.25),r:6,fill:"var(--violet)","class":"dot"}));
+  C.appendChild(el("text",{x:X(3.75),y:Y(-2.25)+20,"class":"lab",fill:"var(--violet)"},"いちばん低い点"));
+  C.appendChild(el("text",{x:X(3.75),y:Y(-2.25)+36,"class":"lab-m",fill:"var(--violet)"},"x = 7/2,  y = -9/4"));
+  svg.appendChild(C);
+
+  coreHL=[A,B,C];
+  var faces=[].slice.call(document.querySelectorAll(".face"));
+  function pick(i,byUser){
+    coreSel=i;
+    faces.forEach(function(b,k){b.setAttribute("aria-selected",k===i?"true":"false");});
+    coreHL.forEach(function(gg,k){gg.setAttribute("visibility",k===i?"visible":"hidden");});
+    document.getElementById("coreShade").setAttribute("visibility",i>=1?"visible":"hidden");
+    document.getElementById("coreCap").textContent = [
+      "展開形が教えるのは、縦軸との交点。定数項 10 がそのまま「出発点の高さ」。",
+      "因数分解形が教えるのは、ゼロになる2点。帯の両端が x=2 と x=5。",
+      "ゼロ点がわかれば、いちばん低い点もわかる。2 と 5 の真ん中 x=7/2 で、y は -9/4。"
+    ][i];
+    if(byUser){try{faces[i].focus({preventScroll:true});}catch(e){}}
+  }
+  faces.forEach(function(b){b.addEventListener("click",function(){pick(+b.dataset.face,true);});});
+  pick(0);
+  window.__corePick=pick;
+})();
+
+/* ══════════ 2. ボール ══════════ */
+var ball={raf:0,t:0,playing:false};
+(function(){
+  var svg=document.getElementById("ballSvg");
+  var X=sc(0,4.6,150,436), Y=sc(0,23,282,42);
+  var f=function(t){return 20*t-5*t*t;};
+  var defs=el("defs");var cp=el("clipPath",{id:"ballClip"});
+  cp.appendChild(el("rect",{x:150,y:36,width:290,height:250}));defs.appendChild(cp);svg.appendChild(defs);
+
+  /* 左：高さの柱 */
+  svg.appendChild(el("text",{x:72,y:24,"class":"lab","text-anchor":"middle",fill:"var(--ink-3)"},"実際の高さ"));
+  svg.appendChild(el("rect",{x:46,y:42,width:52,height:240,fill:"var(--sunk)",rx:3}));
+  svg.appendChild(el("line",{x1:38,y1:Y(20),x2:106,y2:Y(20),"class":"dash",stroke:"var(--violet)"}));
+  svg.appendChild(el("text",{x:34,y:Y(20)+4,"class":"lab-m",fill:"var(--violet)","text-anchor":"end"},"20m"));
+  var bdot=el("circle",{cx:72,cy:Y(0),r:11,fill:"var(--teal)",stroke:"var(--stage)","stroke-width":2});
+  svg.appendChild(bdot);
+
+  /* 右：h-t グラフ */
+  for(var i=0;i<=4;i++) svg.appendChild(el("line",{x1:X(i),y1:42,x2:X(i),y2:282,"class":"grid-l"}));
+  [5,10,15,20].forEach(function(v){
+    svg.appendChild(el("line",{x1:150,y1:Y(v),x2:436,y2:Y(v),"class":"grid-l"}));
+    svg.appendChild(el("text",{x:144,y:Y(v)+4,"class":"tick","text-anchor":"end"},String(v)));});
+  svg.appendChild(el("line",{x1:140,y1:Y(0),x2:440,y2:Y(0),"class":"axis"}));
+  svg.appendChild(el("line",{x1:X(0),y1:36,x2:X(0),y2:290,"class":"axis"}));
+  for(i=1;i<=4;i++) svg.appendChild(el("text",{x:X(i),y:Y(0)+17,"class":"tick","text-anchor":"middle"},String(i)));
+  svg.appendChild(el("text",{x:X(2),y:Y(0)+33,"class":"lab",fill:"var(--ink-3)","text-anchor":"middle"},"時間 t（秒）"));
+  svg.appendChild(el("text",{x:152,y:24,"class":"lab",fill:"var(--ink-3)"},"高さ h（m）"));
+  svg.appendChild(el("rect",{x:150,y:Y(0),width:286,height:6,fill:"var(--rule)"}));
+  svg.appendChild(el("path",{d:fpath(f,X,Y,0,4),"class":"curve","clip-path":"url(#ballClip)"}));
+
+  [[0,"t = 0"],[4,"t = 4"]].forEach(function(p){
+    svg.appendChild(el("circle",{cx:X(p[0]),cy:Y(0),r:7,fill:"none",stroke:"var(--teal)","class":"pulse"}));
+    svg.appendChild(el("circle",{cx:X(p[0]),cy:Y(0),r:6,fill:"var(--teal)","class":"dot"}));
+    svg.appendChild(el("text",{x:X(p[0]),y:Y(0)-13,"class":"lab-m",fill:"var(--teal)","text-anchor":"middle"},p[1]));});
+  svg.appendChild(el("circle",{cx:X(2),cy:Y(20),r:5.5,fill:"var(--violet)","class":"dot"}));
+  svg.appendChild(el("text",{x:X(2),y:Y(20)-12,"class":"lab-m",fill:"var(--violet)","text-anchor":"middle"},"t = 2"));
+  svg.appendChild(el("text",{x:X(2.15),y:Y(20)+16,"class":"lab",fill:"var(--violet)"},"2つの解の真ん中"));
+
+  var trace=el("path",{d:"",fill:"none",stroke:"var(--teal)","stroke-width":4,"stroke-linecap":"round",
+    "clip-path":"url(#ballClip)"});
+  svg.appendChild(trace);
+  var tdot=el("circle",{cx:X(0),cy:Y(0),r:7,fill:"var(--teal)",stroke:"var(--stage)","stroke-width":2});
+  svg.appendChild(tdot);
+
+  var read=document.getElementById("ballRead"), btn=document.getElementById("ballPlay");
+  function set(t){
+    ball.t=t; var h=f(t);
+    bdot.setAttribute("cy",Y(Math.max(0,h)));
+    tdot.setAttribute("cx",X(t)); tdot.setAttribute("cy",Y(h));
+    trace.setAttribute("d", t>0.01? fpath(f,X,Y,0,t,Math.max(2,Math.round(t*50))) : "");
+    read.innerHTML="<b><i>t</i></b> = "+fmt(t,2)+" s　<b><i>h</i></b> = "+fmt(Math.max(0,h),1)+" m";
+  }
+  function stop(){ if(ball.raf)cancelAnimationFrame(ball.raf); ball.raf=0; ball.playing=false; btn.textContent="投げる"; }
+  function play(){
+    if(ball.playing){stop();return;}
+    ball.playing=true; btn.textContent="とめる";
+    var t0=performance.now();
+    (function step(now){
+      var t=(now-t0)/1000*0.95;
+      if(t>=4){set(4);stop();return;}
+      set(t); ball.raf=requestAnimationFrame(step);
+    })(t0);
+  }
+  btn.addEventListener("click",play);
+  set(reduced?2:0);
+  ball.stop=stop; ball.reset=function(){stop();set(reduced?2:0);};
+})();
+
+/* ══════════ 3. ICカード共振 ══════════ */
+var nfc={raf:0,phase:0};
+(function(){
+  var svg=document.getElementById("nfcSvg"), F0=13.56, Q=26;
+  var defs=el("defs");var cp=el("clipPath",{id:"nfcClip"});
+  cp.appendChild(el("rect",{x:112,y:34,width:324,height:116}));defs.appendChild(cp);svg.appendChild(defs);
+
+  /* 上段：波 */
+  svg.appendChild(el("text",{x:112,y:26,"class":"lab",fill:"var(--ink-3)"},"カードに流れる電流"));
+  svg.appendChild(el("line",{x1:112,y1:92,x2:436,y2:92,"class":"grid-l"}));
+  var wave=el("path",{d:"",fill:"none",stroke:"var(--teal)","stroke-width":2.2,"stroke-linecap":"round",
+    "clip-path":"url(#nfcClip)"});
+  svg.appendChild(wave);
+  /* カード */
+  var card=el("g");
+  card.appendChild(el("rect",{x:24,y:56,width:74,height:48,rx:6,fill:"var(--sunk)",stroke:"var(--rule)","stroke-width":1.5}));
+  var coil=el("rect",{x:36,y:66,width:50,height:28,rx:4,fill:"none",stroke:"var(--ink-3)","stroke-width":2.4});
+  card.appendChild(coil);
+  var lamp=el("circle",{cx:61,cy:118,r:5,fill:"var(--rule)"});
+  card.appendChild(lamp);
+  var lampTx=el("text",{x:61,y:140,"class":"lab","text-anchor":"middle",fill:"var(--ink-3)"},"OFF");
+  card.appendChild(lampTx);
+  svg.appendChild(card);
+
+  /* 下段：応答曲線 */
+  var X=sc(6,21,112,436), Y=sc(0,1.08,310,186);
+  function amp(f){var r=f/F0; var d=1-r*r; return 1/Math.sqrt(d*d+Math.pow(r/Q,2));}
+  var peak=amp(F0);
+  svg.appendChild(el("text",{x:112,y:176,"class":"lab",fill:"var(--ink-3)"},"応答の大きさ"));
+  svg.appendChild(el("line",{x1:112,y1:Y(0),x2:440,y2:Y(0),"class":"axis"}));
+  svg.appendChild(el("line",{x1:X(6),y1:182,x2:X(6),y2:316,"class":"axis"}));
+  [8,10,12,14,16,18,20].forEach(function(v){
+    svg.appendChild(el("line",{x1:X(v),y1:186,x2:X(v),y2:310,"class":"grid-l"}));
+    svg.appendChild(el("text",{x:X(v),y:Y(0)+16,"class":"tick","text-anchor":"middle"},String(v)));});
+  svg.appendChild(el("text",{x:X(20.6),y:Y(0)+30,"class":"lab",fill:"var(--ink-3)","text-anchor":"end"},"周波数 f（MHz）"));
+  svg.appendChild(el("path",{d:fpath(function(f){return amp(f)/peak;},X,Y,6,21,420),"class":"curve"}));
+  svg.appendChild(el("line",{x1:X(F0),y1:Y(0),x2:X(F0),y2:Y(1.03),"class":"dash",stroke:"var(--teal)"}));
+  svg.appendChild(el("text",{x:X(F0),y:Y(1.03)-7,"class":"lab-m",fill:"var(--teal)","text-anchor":"middle"},"13.56"));
+  svg.appendChild(el("text",{x:X(F0)+6,y:Y(.55),"class":"lab",fill:"var(--teal)"},"ここで"));
+  svg.appendChild(el("text",{x:X(F0)+6,y:Y(.55)+15,"class":"lab-m",fill:"var(--teal)"},"1-(f/13.56)² = 0"));
+  var fdot=el("circle",{cx:X(8.6),cy:Y(amp(8.6)/peak),r:6.5,fill:"var(--violet)","class":"dot"});
+  svg.appendChild(fdot);
+
+  var slider=document.getElementById("freq"), read=document.getElementById("freqRead"),
+      state=document.getElementById("nfcState"), cur=8.6, a=0;
+  function upd(){
+    cur=+slider.value; a=amp(cur)/peak;
+    read.innerHTML="<b><i>f</i></b> = "+fmt(cur,2)+" MHz";
+    fdot.setAttribute("cx",X(cur)); fdot.setAttribute("cy",Y(a));
+    var resid=1-Math.pow(cur/F0,2);
+    var on=a>0.55;
+    lamp.setAttribute("fill",on?"var(--teal)":"var(--rule)");
+    coil.setAttribute("stroke",on?"var(--teal)":"var(--ink-3)");
+    lampTx.textContent=on?"通信中":"OFF";
+    lampTx.setAttribute("fill",on?"var(--teal)":"var(--ink-3)");
+    state.className="statebox"+(on?" ok":"");
+    state.innerHTML = on
+      ? "反応した。式の値は "+fmt(resid,3)+" ——ほぼ 0。"
+      : "まだ反応しない。式の値は "+fmt(resid,3)+" で、0 から離れている。";
+    if(reduced) draw();
+  }
+  function draw(){
+    var d="",i,x,yv;
+    for(i=0;i<=160;i++){
+      x=112+324*i/160;
+      yv=92-Math.sin(i/160*Math.PI*2*7+nfc.phase)*(5+a*48);
+      d+=(i?"L":"M")+x.toFixed(1)+" "+yv.toFixed(1);
+    }
+    wave.setAttribute("d",d);
+  }
+  nfc.start=function(){ if(reduced){draw();return;} if(nfc.raf)return;
+    (function loop(){ nfc.phase+=0.14; draw(); nfc.raf=requestAnimationFrame(loop); })(); };
+  nfc.stop=function(){ if(nfc.raf)cancelAnimationFrame(nfc.raf); nfc.raf=0; };
+  slider.addEventListener("input",upd);
+  upd(); draw();
+})();
+
+/* ══════════ 4. トンネル ══════════ */
+(function(){
+  var svg=document.getElementById("tunSvg");
+  var X=sc(-12,12,40,440), Y=sc(-0.7,7.4,316,30);
+  var f=function(x){return 6-0.06*x*x;};
+  var TH=4.1, TW=2.5;
+  var defs=el("defs");var cp=el("clipPath",{id:"tunClip"});
+  cp.appendChild(el("rect",{x:40,y:26,width:400,height:(Y(0)-26)}));defs.appendChild(cp);svg.appendChild(defs);
+
+  /* 地山 */
+  svg.appendChild(el("path",{d:"M"+X(-11.4)+" "+Y(0)+"L"+X(-11.4)+" "+Y(6.9)+"L"+X(11.4)+" "+Y(6.9)+"L"+X(11.4)+" "+Y(0)+"Z",
+    fill:"var(--sunk)"}));
+  svg.appendChild(el("path",{d:fpath(f,X,Y,-10,10,200)+"L"+X(10)+" "+Y(0)+"L"+X(-10)+" "+Y(0)+"Z",
+    fill:"var(--stage)"}));
+  svg.appendChild(el("path",{d:fpath(f,X,Y,-10,10,200),"class":"curve"}));
+  svg.appendChild(el("line",{x1:X(-11.6),y1:Y(0),x2:X(11.6),y2:Y(0),"class":"axis","stroke-width":2.4}));
+
+  /* 高さ4.1の線 */
+  svg.appendChild(el("line",{x1:X(-10),y1:Y(TH),x2:X(10),y2:Y(TH),"class":"dash",stroke:"var(--violet)"}));
+  svg.appendChild(el("text",{x:X(-9.7),y:Y(TH)-6,"class":"lab-m",fill:"var(--violet)"},"y = 4.1"));
+
+  /* y=0 の2解 */
+  [[-10,"x = -10"],[10,"x = 10"]].forEach(function(p){
+    svg.appendChild(el("circle",{cx:X(p[0]),cy:Y(0),r:7,fill:"none",stroke:"var(--teal)","class":"pulse"}));
+    svg.appendChild(el("circle",{cx:X(p[0]),cy:Y(0),r:6,fill:"var(--teal)","class":"dot"}));
+    svg.appendChild(el("text",{x:X(p[0]),y:Y(0)+20,"class":"lab-m",fill:"var(--teal)","text-anchor":"middle"},p[1]));});
+  svg.appendChild(el("line",{x1:X(-10),y1:Y(6.55),x2:X(10),y2:Y(6.55),stroke:"var(--teal)","stroke-width":1.3}));
+  svg.appendChild(el("text",{x:X(0),y:Y(6.55)-8,"class":"lab",fill:"var(--teal)","text-anchor":"middle"},"幅 20 m ＝ y = 0 の2解の間"));
+
+  /* トラック */
+  var truck=el("g");
+  var body=el("rect",{x:0,y:0,width:X(TW)-X(0),height:Y(0)-Y(TH),rx:3,fill:"var(--teal-soft)",
+    stroke:"var(--teal)","stroke-width":2});
+  truck.appendChild(body);
+  var cab=el("rect",{x:0,y:0,width:(X(TW)-X(0))*0.34,height:(Y(0)-Y(TH))*0.42,rx:2,
+    fill:"var(--teal)",opacity:.35,stroke:"none"});
+  truck.appendChild(cab);
+  svg.appendChild(truck);
+  var hlabel=el("text",{x:0,y:0,"class":"lab-m","text-anchor":"middle",fill:"var(--teal)"},"4.1 m");
+  svg.appendChild(hlabel);
+
+  var slider=document.getElementById("pos"), read=document.getElementById("posRead"),
+      state=document.getElementById("tunState");
+  var w=X(TW)-X(0), h=Y(0)-Y(TH);
+  function upd(){
+    var s=+slider.value;
+    var left=X(s-TW/2), top=Y(TH);
+    body.setAttribute("x",left); body.setAttribute("y",top);
+    body.setAttribute("width",w); body.setAttribute("height",h);
+    cab.setAttribute("x",left+2); cab.setAttribute("y",top+2);
+    hlabel.setAttribute("x",X(s)); hlabel.setAttribute("y",Y(TH)-9);
+    var outer=Math.abs(s)+TW/2;
+    var ceil=f(outer);
+    var gap=ceil-TH;
+    read.innerHTML="<b><i>x</i></b> = "+fmt(s,2)+" m";
+    var hit=gap<0;
+    body.setAttribute("stroke",hit?"var(--warn)":"var(--teal)");
+    body.setAttribute("fill",hit?"transparent":"var(--teal-soft)");
+    cab.setAttribute("fill",hit?"var(--warn)":"var(--teal)");
+    hlabel.setAttribute("fill",hit?"var(--warn)":"var(--teal)");
+    state.className="statebox "+(hit?"hit":"ok");
+    state.textContent = hit
+      ? "当たる。天井は "+fmt(ceil,2)+" m しかない（"+fmt(-gap,2)+" m 不足）"
+      : "通れる。天井までの余裕 "+fmt(gap,2)+" m";
+  }
+  slider.addEventListener("input",upd); upd();
+})();
+
+/* ══════════ 5. パン屋の利益 ══════════ */
+(function(){
+  var svg=document.getElementById("profSvg");
+  var X=sc(-55,115,62,436), Y=sc(-3000,11000,300,36);
+  var f=function(x){return 2*(40+x)*(100-x);};
+  var defs=el("defs");var cp=el("clipPath",{id:"pClip"});
+  cp.appendChild(el("rect",{x:62,y:30,width:374,height:276}));defs.appendChild(cp);svg.appendChild(defs);
+
+  svg.appendChild(el("rect",{x:X(-40),y:36,width:X(100)-X(-40),height:Y(-3000)-36,
+    fill:"var(--teal-soft)",opacity:.5}));
+  svg.appendChild(el("text",{x:X(-40)+8,y:54,"class":"lab",fill:"var(--teal)"},"黒字ゾーン"));
+  [0,2500,5000,7500,10000].forEach(function(v){
+    svg.appendChild(el("line",{x1:62,y1:Y(v),x2:436,y2:Y(v),"class":"grid-l"}));
+    svg.appendChild(el("text",{x:56,y:Y(v)+4,"class":"tick","text-anchor":"end"},
+      v?String(v/1000)+"k":"0"));});
+  svg.appendChild(el("line",{x1:58,y1:Y(0),x2:440,y2:Y(0),"class":"axis"}));
+  [-40,0,30,60,100].forEach(function(v){
+    svg.appendChild(el("line",{x1:X(v),y1:36,x2:X(v),y2:300,"class":"grid-l"}));
+    svg.appendChild(el("text",{x:X(v),y:Y(0)+17,"class":"tick","text-anchor":"middle"},String(v)));});
+  svg.appendChild(el("text",{x:X(30),y:Y(0)+34,"class":"lab",fill:"var(--ink-3)","text-anchor":"middle"},"値上げ額 x（円）"));
+  svg.appendChild(el("text",{x:62,y:28,"class":"lab",fill:"var(--ink-3)"},"1日の利益（円）"));
+  svg.appendChild(el("path",{d:fpath(f,X,Y,-55,115),"class":"curve","clip-path":"url(#pClip)"}));
+
+  [[-40,"x = -40","安すぎる"],[100,"x = 100","高すぎる"]].forEach(function(p){
+    svg.appendChild(el("circle",{cx:X(p[0]),cy:Y(0),r:7,fill:"none",stroke:"var(--teal)","class":"pulse"}));
+    svg.appendChild(el("circle",{cx:X(p[0]),cy:Y(0),r:6,fill:"var(--teal)","class":"dot"}));
+    svg.appendChild(el("text",{x:X(p[0]),y:Y(0)-14,"class":"lab-m",fill:"var(--teal)","text-anchor":"middle"},p[1]));
+    svg.appendChild(el("text",{x:X(p[0]),y:Y(0)+32,"class":"lab",fill:"var(--teal)","text-anchor":"middle"},p[2]));});
+  svg.appendChild(el("line",{x1:X(30),y1:Y(0),x2:X(30),y2:Y(9800),"class":"dash",stroke:"var(--violet)"}));
+  svg.appendChild(el("circle",{cx:X(30),cy:Y(9800),r:6,fill:"var(--violet)","class":"dot"}));
+  svg.appendChild(el("text",{x:X(30),y:Y(9800)-12,"class":"lab-m",fill:"var(--violet)","text-anchor":"middle"},"x = 30"));
+
+  var pdot=el("circle",{cx:X(0),cy:Y(f(0)),r:7,fill:"var(--amber)",stroke:"var(--stage)","stroke-width":2.4});
+  svg.appendChild(pdot);
+  var pbar=el("rect",{x:X(0)-5,y:Y(f(0)),width:10,height:Y(0)-Y(f(0)),fill:"var(--amber)",opacity:.28});
+  svg.insertBefore(pbar,pdot);
+
+  var slider=document.getElementById("price"), read=document.getElementById("priceRead"),
+      state=document.getElementById("profState");
+  function upd(){
+    var x=+slider.value, p=f(x), n=200-2*x, price=100+x;
+    pdot.setAttribute("cx",X(x)); pdot.setAttribute("cy",Y(p));
+    pbar.setAttribute("x",X(x)-5);
+    pbar.setAttribute("y",Math.min(Y(p),Y(0)));
+    pbar.setAttribute("height",Math.abs(Y(0)-Y(p)));
+    pbar.setAttribute("fill",p<0?"var(--warn)":"var(--amber)");
+    pdot.setAttribute("fill",p<0?"var(--warn)":"var(--amber)");
+    read.innerHTML="<b>"+price+" 円</b>・"+Math.max(0,n)+" 個";
+    state.className="statebox "+(p<=0?"hit":(x===30?"ok":""));
+    state.textContent = p<=0
+      ? "赤字。利益 "+yen(p)+" 円／日"
+      : (x===30 ? "最大。利益 9,800 円／日（これが答え）" : "利益 "+yen(p)+" 円／日");
+  }
+  slider.addEventListener("input",upd); upd();
+})();
+
+/* ══════════ 進行 ══════════ */
+(function(){
+  var META=[["問い","20秒"],["三つの情報","60秒"],["三つの本質","30秒"],["① 力学","50秒"],
+            ["② 通信","40秒"],["③ インフラ","40秒"],["④ 経済","50秒"],["締め","30秒"]];
+  var scenes=[].slice.call(document.querySelectorAll(".scene"));
+  var stepsBox=document.getElementById("steps"), where=document.getElementById("where");
+  var prev=document.getElementById("prev"), next=document.getElementById("next");
+  var cur=0, btns=[];
+
+  META.forEach(function(m,i){
+    var b=document.createElement("button");
+    b.className="step"; b.type="button";
+    b.innerHTML='<span class="n">'+(i+1)+'</span><span class="lbl">'+m[0]+'</span>';
+    b.title=m[0]+"・"+m[1];
+    b.addEventListener("click",function(){go(i);});
+    stepsBox.appendChild(b); btns.push(b);
+  });
+
+  function go(i){
+    i=Math.max(0,Math.min(scenes.length-1,i));
+    if(i===4){nfc.start();}else{nfc.stop();}
+    if(i!==3&&ball.stop){ball.stop();}
+    cur=i;
+    scenes.forEach(function(s,k){s.hidden=(k!==i);});
+    btns.forEach(function(b,k){b.setAttribute("aria-current",k===i?"true":"false");});
+    where.textContent=(i+1)+" / "+scenes.length+"　"+META[i][0]+"・"+META[i][1];
+    prev.disabled=(i===0); next.disabled=(i===scenes.length-1);
+    try{window.scrollTo({top:0,behavior:reduced?"auto":"smooth"});}catch(e){window.scrollTo(0,0);}
+  }
+  prev.addEventListener("click",function(){go(cur-1);});
+  next.addEventListener("click",function(){go(cur+1);});
+  [].forEach.call(document.querySelectorAll("[data-go]"),function(b){
+    b.addEventListener("click",function(){go(+b.dataset.go);});});
+
+  document.addEventListener("keydown",function(e){
+    var t=e.target.tagName;
+    if(t==="INPUT"&&(e.key==="ArrowLeft"||e.key==="ArrowRight"))return;
+    if(e.key==="ArrowRight"||e.key==="PageDown"){e.preventDefault();go(cur+1);}
+    else if(e.key==="ArrowLeft"||e.key==="PageUp"){e.preventDefault();go(cur-1);}
+    else if(e.key>="1"&&e.key<="8"){go(+e.key-1);}
+  });
+
+  /* 指導メモ */
+  var nb=document.getElementById("noteBtn"), shown=false;
+  nb.addEventListener("click",function(){
+    shown=!shown; nb.setAttribute("aria-pressed",shown?"true":"false");
+    [].forEach.call(document.querySelectorAll(".note"),function(n){n.hidden=!shown;});
+  });
+
+  /* 全画面 */
+  var fb=document.getElementById("fsBtn");
+  fb.addEventListener("click",function(){
+    try{
+      if(document.fullscreenElement){document.exitFullscreen();}
+      else{var p=document.documentElement.requestFullscreen();if(p&&p.catch)p.catch(function(){});}
+    }catch(e){}
+  });
+  document.addEventListener("fullscreenchange",function(){
+    fb.textContent=document.fullscreenElement?"全画面を終了":"全画面";});
+
+  /* 更新をまたいで位置を保つ */
+  function start(st){
+    go((st&&typeof st.scene==="number")?st.scene:0);
+    if(st&&typeof st.face==="number"&&window.__corePick)window.__corePick(st.face);
+  }
+  if(window.claude&&window.claude.hot){
+    window.claude.hot.snapshot(function(){return {scene:cur,face:coreSel};});
+    window.claude.hot.ready?window.claude.hot.ready(start):start(window.claude.hot.data||{});
+  }else{start({});}
+})();
+})();
+</script>
+</body>
+</html>
