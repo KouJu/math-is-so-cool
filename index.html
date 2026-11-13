@@ -335,7 +335,7 @@ blockquote:last-of-type{border-left-color:var(--violet)}
   </div>
   <p class="lede">このうち、現場でいちばん値段がつくのは <b style="color:var(--teal)">因数分解</b> です。<br>
   なぜなら「<span class="eq"><i>y</i> = 0</span> になる <span class="eq"><i>x</i></span> を知りたい」という形の問題が、世の中に大量にあるからです。</p>
-  <p class="small">これから4つ見せます。ボール、交通系ICカード、トンネル、パン屋。<br>
+  <p class="small">これから4つ見せます。ボール、パン屋、交通系ICカード、トンネル。<br>
   分野はまったく違うのに、聞かれていることは全部同じです。<span class="eq"><i>y</i> = 0</span> になるのはどこか。</p>
   <p style="margin-top:20px"><button class="btn" data-go="3">1つめ・ボールを投げる →</button></p>
   <div class="note" hidden>
@@ -379,78 +379,8 @@ blockquote:last-of-type{border-left-color:var(--violet)}
 </section>
 
 <!-- ═══ 5 ═══ -->
-<section class="scene" id="sc4" hidden>
-  <p class="eyebrow">② 情報通信機器 ／ 電波をつかまえる</p>
-  <h2>ICカードが反応する周波数</h2>
-  <div class="cols">
-    <div>
-      <p class="small">改札にかざすカードの中には、コイルとコンデンサだけの小さな回路が入っています。
-      この回路は、ある1つの周波数のときだけ電流が大きく振れ、そこで電力をもらって動きます。
-      その条件が、<b>ある式がちょうど 0 になること</b>です。</p>
-      <div class="reads">
-        <div class="read" style="--rd:var(--ink-3)"><span class="k">1 − (<i>f</i>/13.56)<sup>2</sup> = 0</span><span class="t">共振の条件（<i class="v">f</i> の単位は MHz）</span></div>
-        <div class="read" style="--rd:var(--teal)"><span class="k">(1 − <sup><i>f</i></sup>⁄<sub>13.56</sub>)(1 + <sup><i>f</i></sup>⁄<sub>13.56</sub>) = 0</span><span class="t">教科書どおりの <b><i>a</i><sup>2</sup> − <i>b</i><sup>2</sup> = (<i>a</i>−<i>b</i>)(<i>a</i>+<i>b</i>)</b>。和と差の積</span></div>
-        <div class="read" style="--rd:var(--violet)"><span class="k"><i>f</i> = 13.56 MHz</span><span class="t">負の解は周波数としてありえないので捨てる。残った1つが世界共通の規格値</span></div>
-      </div>
-      <div class="ctrl">
-        <label for="freq">周波数</label>
-        <input type="range" id="freq" min="6" max="21" step="0.04" value="8.6">
-        <span class="readout" id="freqRead"><b><i>f</i></b> = 8.60 MHz</span>
-        <span class="tag">図を直接ドラッグ</span>
-      </div>
-      <div class="statebox" id="nfcState">まだ反応しない。式の値が 0 から離れている。</div>
-      <div class="punch">因数分解は、設計図そのもの。<br>「<span style="color:var(--teal)">0 になる <i>f</i></span>」を決めることが、部品の値を決めることだった。</div>
-    </div>
-    <figure>
-      <svg class="plot" id="nfcSvg" viewBox="0 0 470 340" role="img"
-        aria-label="上段はカードに流れる電流の波。周波数を13.56MHzに合わせると振幅が急に大きくなりカードが点灯する。下段は応答の大きさの曲線で、13.56MHzに鋭い山がある。"></svg>
-      <figcaption>スライダーを動かすと、波の振れ幅が変わる。13.56 MHz で式の値が 0 になり、そこだけ急に大きく振れてカードが起きる。これが「かざすと鳴る」の中身。</figcaption>
-    </figure>
-  </div>
-  <div class="note" hidden>
-    <b>指導メモ・約40秒</b>
-    自分の交通系ICカードを出して見せると効く。スライダーをゆっくり通過させて、点灯する幅の狭さを体感させる。
-    「和と差の積って、これのためにあったの?」という反応が出たら成功。
-  </div>
-</section>
-
-<!-- ═══ 6 ═══ -->
-<section class="scene" id="sc5" hidden>
-  <p class="eyebrow">③ インフラ管理 ／ 通れるかどうか</p>
-  <h2>トンネルの、通れる幅</h2>
-  <div class="cols">
-    <div>
-      <p class="small">放物線のアーチで断面をつくったトンネル。中心の高さを 6 m として、断面は
-      <span class="eq"><i>y</i> = 6 − 0.06<i>x</i><sup>2</sup></span>（<span class="eq"><i>x</i></span> は中心からの距離、m）。</p>
-      <div class="reads">
-        <div class="read" style="--rd:var(--teal)"><span class="k">6 − 0.06<i>x</i><sup>2</sup> = 0.06(10 − <i>x</i>)(10 + <i>x</i>)</span><span class="t">0 になるのは <i class="v">x</i> = ±10。トンネルの<b>幅は 20 m</b></span></div>
-        <div class="read" style="--rd:var(--violet)"><span class="k">6 − 0.06<i>x</i><sup>2</sup> = 4.1</span><span class="t">高さ 4.1 m のトラックが当たらない境界は <i class="v">x</i> = ±5.63。車体の幅を足すと、走れるのは中心から ±4.38 m まで</span></div>
-      </div>
-      <div class="ctrl">
-        <label for="pos">トラックの位置</label>
-        <input type="range" id="pos" min="-8" max="8" step="0.05" value="0">
-        <span class="readout" id="posRead"><b><i>x</i></b> = 0.00 m</span>
-        <span class="tag">トラックを直接ドラッグ</span>
-      </div>
-      <div class="statebox ok" id="tunState">通れる。天井までの余裕 1.90 m</div>
-      <div class="punch">道路の車線が中央寄りにあるのは、デザインではない。<br>この<span style="color:var(--teal)">式が出した境界</span>そのもの。</div>
-    </div>
-    <figure>
-      <svg class="plot" id="tunSvg" viewBox="0 0 470 340" role="img"
-        aria-label="放物線アーチのトンネル断面図。トラックを横に動かすと、端に寄るほど天井が低くなり、中心から約4.4mを超えると屋根が当たる。"></svg>
-      <figcaption>アーチが地面に着く 2 点が <span class="eq"><i>y</i> = 0</span> の解。トラックを端に寄せていくと、どこで当たるかも同じ式が教える。点検・通行許可・高さ制限の標識は、全部この計算の結果。</figcaption>
-    </figure>
-  </div>
-  <div class="note" hidden>
-    <b>指導メモ・約40秒</b>
-    トラックを端まで動かして当てて見せる。「大型車が通れる道かどうかを、現場で毎日この式で判断している」。
-    <i>y</i>=0 だけでなく <i>y</i>=4.1 も同じ技で解けると添えると、応用の広さが伝わる。
-  </div>
-</section>
-
-<!-- ═══ 7 ═══ -->
 <section class="scene" id="sc6" hidden>
-  <p class="eyebrow">④ 経済・金融 ／ もうかる値段</p>
+  <p class="eyebrow">② 経済・金融 ／ もうかる値段</p>
   <h2>パンを、何円値上げするか</h2>
   <div class="cols">
     <div>
@@ -509,7 +439,80 @@ blockquote:last-of-type{border-left-color:var(--violet)}
     1 と 2 を別々に確認してから、3 でかけ算にする。ここを急がない。「2つに分けたら、因数分解された形が勝手に出てきた」が言いたいこと。
     そのあと値段を 60 円（<i>x</i> = −40）と 200 円（<i>x</i> = 100）に合わせると、下の表示が
     「1個あたり 0 円 × 280 個」「140 円 × 0 個」になる。かけ算が 0 になる2通りが、そのまま「安すぎる」「高すぎる」だと見せる。
-    値下げ方向に振れば赤字にも落ちる。最後に「2つのゼロ点の真ん中が最大」がボールと同じだと気づかせたい。ここで4つの例が1本につながる。
+    値下げ方向に振れば赤字にも落ちる。最後に「2つのゼロ点の真ん中が最大」がボールと同じだと気づかせたい。
+    直前のボールと<b>まったく同じ道具</b>なので、「分野が違うのに同じ式で解けた」をここで一度印象づけておく。次の2つは別の道具に変わる。
+  </div>
+</section>
+
+<!-- ═══ 6 ═══ -->
+<section class="scene" id="sc4" hidden>
+  <p class="eyebrow">③ 情報通信機器 ／ 電波をつかまえる</p>
+  <h2>ICカードが反応する周波数</h2>
+  <div class="cols">
+    <div>
+      <p class="small">改札にかざすカードの中には、コイルとコンデンサだけの小さな回路が入っています。
+      この回路は、ある1つの周波数のときだけ電流が大きく振れ、そこで電力をもらって動きます。
+      その条件が、<b>ある式がちょうど 0 になること</b>です。</p>
+      <div class="reads">
+        <div class="read" style="--rd:var(--ink-3)"><span class="k">1 − (<i>f</i>/13.56)<sup>2</sup> = 0</span><span class="t">共振の条件（<i class="v">f</i> の単位は MHz）</span></div>
+        <div class="read" style="--rd:var(--teal)"><span class="k">(1 − <sup><i>f</i></sup>⁄<sub>13.56</sub>)(1 + <sup><i>f</i></sup>⁄<sub>13.56</sub>) = 0</span><span class="t">教科書どおりの <b><i>a</i><sup>2</sup> − <i>b</i><sup>2</sup> = (<i>a</i>−<i>b</i>)(<i>a</i>+<i>b</i>)</b>。和と差の積</span></div>
+        <div class="read" style="--rd:var(--violet)"><span class="k"><i>f</i> = 13.56 MHz</span><span class="t">負の解は周波数としてありえないので捨てる。残った1つが世界共通の規格値</span></div>
+      </div>
+      <div class="ctrl">
+        <label for="freq">周波数</label>
+        <input type="range" id="freq" min="6" max="21" step="0.04" value="8.6">
+        <span class="readout" id="freqRead"><b><i>f</i></b> = 8.60 MHz</span>
+        <span class="tag">図を直接ドラッグ</span>
+      </div>
+      <div class="statebox" id="nfcState">まだ反応しない。式の値が 0 から離れている。</div>
+      <div class="punch">因数分解は、設計図そのもの。<br>「<span style="color:var(--teal)">0 になる <i>f</i></span>」を決めることが、部品の値を決めることだった。</div>
+    </div>
+    <figure>
+      <svg class="plot" id="nfcSvg" viewBox="0 0 470 340" role="img"
+        aria-label="上段はカードに流れる電流の波。周波数を13.56MHzに合わせると振幅が急に大きくなりカードが点灯する。下段は応答の大きさの曲線で、13.56MHzに鋭い山がある。"></svg>
+      <figcaption>スライダーを動かすと、波の振れ幅が変わる。13.56 MHz で式の値が 0 になり、そこだけ急に大きく振れてカードが起きる。これが「かざすと鳴る」の中身。</figcaption>
+    </figure>
+  </div>
+  <div class="note" hidden>
+    <b>指導メモ・約40秒</b>
+    自分の交通系ICカードを出して見せると効く。スライダーをゆっくり通過させて、点灯する幅の狭さを体感させる。
+    「和と差の積って、これのためにあったの?」という反応が出たら成功。
+  </div>
+</section>
+
+<!-- ═══ 7 ═══ -->
+<section class="scene" id="sc5" hidden>
+  <p class="eyebrow">④ インフラ管理 ／ 通れるかどうか</p>
+  <h2>トンネルの、通れる幅</h2>
+  <div class="cols">
+    <div>
+      <p class="small">放物線のアーチで断面をつくったトンネル。中心の高さを 6 m として、断面は
+      <span class="eq"><i>y</i> = 6 − 0.06<i>x</i><sup>2</sup></span>（<span class="eq"><i>x</i></span> は中心からの距離、m）。</p>
+      <div class="reads">
+        <div class="read" style="--rd:var(--teal)"><span class="k">6 − 0.06<i>x</i><sup>2</sup> = 0.06(10 − <i>x</i>)(10 + <i>x</i>)</span><span class="t">0 になるのは <i class="v">x</i> = ±10。トンネルの<b>幅は 20 m</b></span></div>
+        <div class="read" style="--rd:var(--violet)"><span class="k">6 − 0.06<i>x</i><sup>2</sup> = 4.1</span><span class="t">高さ 4.1 m のトラックが当たらない境界は <i class="v">x</i> = ±5.63。車体の幅を足すと、走れるのは中心から ±4.38 m まで</span></div>
+      </div>
+      <div class="ctrl">
+        <label for="pos">トラックの位置</label>
+        <input type="range" id="pos" min="-8" max="8" step="0.05" value="0">
+        <span class="readout" id="posRead"><b><i>x</i></b> = 0.00 m</span>
+        <span class="tag">トラックを直接ドラッグ</span>
+      </div>
+      <div class="statebox ok" id="tunState">通れる。天井までの余裕 1.90 m</div>
+      <div class="punch">道路の車線が中央寄りにあるのは、デザインではない。<br>この<span style="color:var(--teal)">式が出した境界</span>そのもの。</div>
+    </div>
+    <figure>
+      <svg class="plot" id="tunSvg" viewBox="0 0 470 340" role="img"
+        aria-label="放物線アーチのトンネル断面図。トラックを横に動かすと、端に寄るほど天井が低くなり、中心から約4.4mを超えると屋根が当たる。"></svg>
+      <figcaption>アーチが地面に着く 2 点が <span class="eq"><i>y</i> = 0</span> の解。トラックを端に寄せていくと、どこで当たるかも同じ式が教える。点検・通行許可・高さ制限の標識は、全部この計算の結果。</figcaption>
+    </figure>
+  </div>
+  <div class="note" hidden>
+    <b>指導メモ・約40秒</b>
+    トラックを端まで動かして当てて見せる。「大型車が通れる道かどうかを、現場で毎日この式で判断している」。
+    <i>y</i>=0 だけでなく <i>y</i>=4.1 も同じ技で解けると添えると、応用の広さが伝わる。
+    4つめなので、ここで全部を振り返る。前半2つ（ボール・パン屋）は (<i>x</i>−<i>a</i>)(<i>x</i>−<i>b</i>)、後半2つ（ICカード・トンネル）は和と差の積。
+    <b>道具は2種類しか使っていない</b>と言ってから締めに入ると、次のページがそのまま答え合わせになる。
   </div>
 </section>
 
@@ -523,7 +526,7 @@ blockquote:last-of-type{border-left-color:var(--violet)}
     <div class="rc"><div class="rt">道具 2</div><div class="rm"><i>a</i><sup>2</sup> − <i>b</i><sup>2</sup> = (<i>a</i> − <i>b</i>)(<i>a</i> + <i>b</i>)</div>
       <div class="rd">ICカードの共振周波数／トンネルの幅。和と差の積、そのまま。</div></div>
   </div>
-  <p class="small" style="margin-top:16px">この2つだけで、落ちてくるボールも、改札のカードも、トンネルの高さ制限も、パンの値段も解けました。
+  <p class="small" style="margin-top:16px">この2つだけで、落ちてくるボールも、パンの値段も、改札のカードも、トンネルの高さ制限も解けました。
   覚える公式が増えたわけではありません。<b>式を見る目</b>が変わっただけです。</p>
   <div class="closing">
     <blockquote>式変形は、答えを出すための作業ではなく、式の中に隠れている情報を取り出すための技。</blockquote>
@@ -1013,7 +1016,7 @@ var nfc={raf:0,phase:0};
 /* ══════════ 進行 ══════════ */
 (function(){
   var META=[["問い","20秒"],["三つの情報","60秒"],["三つの本質","30秒"],["① 力学","50秒"],
-            ["② 通信","40秒"],["③ インフラ","40秒"],["④ 経済","60秒"],["締め","30秒"]];
+            ["② 経済","60秒"],["③ 通信","40秒"],["④ インフラ","40秒"],["締め","30秒"]];
   var scenes=[].slice.call(document.querySelectorAll(".scene"));
   var stepsBox=document.getElementById("steps"), where=document.getElementById("where");
   var prev=document.getElementById("prev"), next=document.getElementById("next");
@@ -1030,7 +1033,7 @@ var nfc={raf:0,phase:0};
 
   function go(i){
     i=Math.max(0,Math.min(scenes.length-1,i));
-    if(i===4){nfc.start();}else{nfc.stop();}
+    if(i===5){nfc.start();}else{nfc.stop();}   /* 通信は6ページ目＝index 5 */
     if(i!==3&&ball.stop){ball.stop();}
     cur=i;
     scenes.forEach(function(s,k){s.hidden=(k!==i);});
