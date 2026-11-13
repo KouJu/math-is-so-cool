@@ -192,6 +192,20 @@ input[type=range]{flex:1;min-width:150px;accent-color:var(--teal);height:22px}
   border-left:3px solid var(--rd,var(--rule));padding:4px 0 4px 11px}
 .read .k{font-family:var(--font-math);font-size:.98rem;color:var(--rd,var(--ink-2));white-space:nowrap}
 .read .t{font-size:.88rem;color:var(--ink-2);line-height:1.6}
+/* 段階を踏む導出 */
+.steps{display:grid;margin:2px 0 4px}
+.stp{display:grid;grid-template-columns:1.75em 1fr;gap:11px;padding:11px 0;
+  border-bottom:1px solid var(--rule-soft)}
+.stp:last-child{border-bottom:0}
+.stp .no{font-size:.72rem;color:var(--ink-3);font-variant-numeric:tabular-nums;
+  border:1px solid var(--rule);border-radius:999px;width:1.75em;height:1.75em;
+  display:grid;place-items:center;align-self:start}
+.stp .lb{font-size:.74rem;letter-spacing:.09em;color:var(--ink-3);margin-bottom:.15em}
+.stp .fx{font-family:var(--font-math);font-size:1.06rem;color:var(--ink);line-height:1.5}
+.stp .fx i{font-style:italic}
+.stp .nt{font-size:.82rem;color:var(--ink-2);line-height:1.65;margin-top:.2em;max-width:30em}
+.stp.hi .fx{color:var(--teal)}
+.stp.hi .no{border-color:var(--teal);color:var(--teal);font-weight:700}
 .punch{border-top:1px solid var(--rule-soft);margin-top:18px;padding-top:16px;
   font-size:clamp(1rem,2.5vw,1.2rem);font-weight:700;line-height:1.65;max-width:30em}
 .statebox{font-size:.92rem;border:1px solid var(--rule);border-radius:4px;padding:10px 13px;
@@ -441,32 +455,61 @@ blockquote:last-of-type{border-left-color:var(--violet)}
   <div class="cols">
     <div>
       <p class="small">1個 100 円のパンが 1日 200 個売れる店。原価は 60 円。
-      調査すると、<b>1円値上げするごとに 2 個売れなくなる</b>とわかった。<span class="eq"><i>x</i></span> 円値上げしたときの1日の利益は——</p>
-      <div class="reads">
-        <div class="read" style="--rd:var(--ink-3)"><span class="k">(40 + <i>x</i>)(200 − 2<i>x</i>)</span><span class="t">1個の利益 × 売れる個数</span></div>
-        <div class="read" style="--rd:var(--teal)"><span class="k">= 2(40 + <i>x</i>)(100 − <i>x</i>)</span><span class="t">0 になるのは <i class="v">x</i> = −40（原価と同じ値段）と <i class="v">x</i> = 100（高すぎて誰も買わない）。<b>この間だけが黒字</b></span></div>
-        <div class="read" style="--rd:var(--violet)"><span class="k"><i>x</i> = (−40 + 100)/2 = 30</span><span class="t">真ん中が最大。<b>130 円が最適</b>で、利益は 9,800 円。ボールの最高点と、まったく同じ理屈</span></div>
+      調査すると、<b>1円値上げするごとに 2 個売れなくなる</b>とわかった。
+      <span class="eq"><i>x</i></span> 円値上げしたら、1日の利益はどうなるか。<b>いきなり式を立てず、2つに分けて考えます。</b></p>
+      <div class="steps">
+        <div class="stp"><span class="no">1</span><div>
+          <div class="lb">まず、1個あたりの利益</div>
+          <div class="fx">(100 + <i>x</i>) − 60 = <b>40 + <i>x</i></b></div>
+          <div class="nt">売る値段から原価を引くだけ。値上げした分がそのまま増える。</div>
+        </div></div>
+        <div class="stp"><span class="no">2</span><div>
+          <div class="lb">次に、売れる個数</div>
+          <div class="fx"><b>200 − 2<i>x</i></b></div>
+          <div class="nt">1円上げるごとに2個減るから、<i class="v">x</i> 円上げれば 2<i class="v">x</i> 個減る。</div>
+        </div></div>
+        <div class="stp hi"><span class="no">3</span><div>
+          <div class="lb">かけ算して、1日の利益</div>
+          <div class="fx"><i>y</i> = (40 + <i>x</i>)(200 − 2<i>x</i>) = 2(40 + <i>x</i>)(100 − <i>x</i>)</div>
+          <div class="nt">分けて考えたから、<b>はじめから因数分解された形</b>で出てきた。展開する必要がない。</div>
+        </div></div>
+        <div class="stp"><span class="no">4</span><div>
+          <div class="lb">利益が 0 になるのは</div>
+          <div class="fx"><i>x</i> = −40　または　<i>x</i> = 100</div>
+          <div class="nt"><b>1個あたりの利益が 0</b>（原価と同じ 60 円。いくら売っても儲からない）か、
+          <b>売れる個数が 0</b>（200 円では誰も買わない）。かけ算が 0 になるのはどちらかが 0 のとき——
+          その2通りが、そのまま2つの理由になっている。</div>
+        </div></div>
+        <div class="stp"><span class="no">5</span><div>
+          <div class="lb">だから最大は、その真ん中</div>
+          <div class="fx"><i>x</i> = (−40 + 100) ÷ 2 = 30</div>
+          <div class="nt"><b>130 円が最適</b>で、利益は 9,800 円。ボールの最高点と、まったく同じ理屈。</div>
+        </div></div>
       </div>
-      <div class="ctrl">
-        <label for="price">値上げ額</label>
-        <input type="range" id="price" min="-45" max="105" step="1" value="0">
-        <span class="readout" id="priceRead"><b>100 円</b>・200 個</span>
-        <span class="tag">点を直接ドラッグ</span>
-      </div>
-      <div class="statebox" id="profState">利益 8,000 円／日</div>
       <div class="punch">因数分解が出した2つのゼロ点は、<br><span style="color:var(--teal)">赤字と黒字の境界線</span>だった。そして真ん中が、答え。</div>
     </div>
-    <figure>
-      <svg class="plot" id="profSvg" viewBox="0 0 470 340" role="img"
-        aria-label="値上げ額と1日の利益の放物線。x=−40 と x=100 で利益が0になり、その間が黒字の帯。x=30 で最大の9800円。"></svg>
-      <figcaption>帯が黒字ゾーン。両端はどちらも利益 0 で、意味はまるで違う（安すぎる／高すぎる）。
-      投資の利回り（IRR）や損益分岐点も、立式すればこれと同じ二次方程式になる。</figcaption>
-    </figure>
+    <div>
+      <figure>
+        <svg class="plot" id="profSvg" viewBox="0 0 470 340" role="img"
+          aria-label="値上げ額と1日の利益の放物線。x=−40 と x=100 で利益が0になり、その間が黒字の帯。x=30 で最大の9800円。"></svg>
+        <figcaption>帯が黒字ゾーン。両端はどちらも利益 0 で、意味はまるで違う（安すぎる／高すぎる）。
+        投資の利回り（IRR）や損益分岐点も、立式すればこれと同じ二次方程式になる。</figcaption>
+      </figure>
+      <div class="ctrl">
+        <label for="price">値上げ額</label>
+        <input type="range" id="price" min="-45" max="100" step="1" value="0">
+        <span class="readout" id="priceRead"><b>100 円</b></span>
+        <span class="tag">点を直接ドラッグ</span>
+      </div>
+      <div class="statebox" id="profState">1個あたり 40 円 × 200 個 = 8,000 円／日</div>
+    </div>
   </div>
   <div class="note" hidden>
-    <b>指導メモ・約50秒</b>
-    スライダーを値下げ方向にも振って、赤字に落ちるのを見せる。
-    「2つのゼロ点の真ん中が最大」がボールと同じだと気づかせたい。ここで4つの例が1本につながる。
+    <b>指導メモ・約60秒</b>
+    1 と 2 を別々に確認してから、3 でかけ算にする。ここを急がない。「2つに分けたら、因数分解された形が勝手に出てきた」が言いたいこと。
+    そのあと値段を 60 円（<i>x</i> = −40）と 200 円（<i>x</i> = 100）に合わせると、下の表示が
+    「1個あたり 0 円 × 280 個」「140 円 × 0 個」になる。かけ算が 0 になる2通りが、そのまま「安すぎる」「高すぎる」だと見せる。
+    値下げ方向に振れば赤字にも落ちる。最後に「2つのゼロ点の真ん中が最大」がボールと同じだと気づかせたい。ここで4つの例が1本につながる。
   </div>
 </section>
 
@@ -517,7 +560,7 @@ function sc(d0,d1,r0,r1){var m=(r1-r0)/(d1-d0);return function(v){return r0+(v-d
 function fpath(f,X,Y,x0,x1,n){var d="",i,x;n=n||220;
   for(i=0;i<=n;i++){x=x0+(x1-x0)*i/n;d+=(i?"L":"M")+X(x).toFixed(2)+" "+Y(f(x)).toFixed(2);}return d;}
 function fmt(v,n){return v.toFixed(n);}
-function yen(v){return Math.round(v).toLocaleString("ja-JP");}
+function yen(v){return Math.round(v).toLocaleString("ja-JP").replace("-","−");}
 function num(v){return String(Math.round(v*1000)/1000).replace("-","−");}
 function par(v){return v<0?"(−"+num(-v)+")":num(v);}
 /* 画面座標 → データ座標（線形スケールの逆関数） */
@@ -946,21 +989,23 @@ var nfc={raf:0,phase:0};
   var slider=document.getElementById("price"), read=document.getElementById("priceRead"),
       state=document.getElementById("profState");
   function upd(){
-    var x=+slider.value, p=f(x), n=200-2*x, price=100+x;
+    var x=+slider.value, p=f(x), n=200-2*x, price=100+x, per=40+x;
     pdot.setAttribute("cx",X(x)); pdot.setAttribute("cy",Y(p));
     pbar.setAttribute("x",X(x)-5);
     pbar.setAttribute("y",Math.min(Y(p),Y(0)));
     pbar.setAttribute("height",Math.abs(Y(0)-Y(p)));
     pbar.setAttribute("fill",p<0?"var(--warn)":"var(--amber)");
     pdot.setAttribute("fill",p<0?"var(--warn)":"var(--amber)");
-    read.innerHTML="<b>"+price+" 円</b>・"+Math.max(0,n)+" 個";
-    state.className="statebox "+(p<=0?"hit":(x===30?"ok":""));
-    state.textContent = p<=0
-      ? "赤字。利益 "+yen(p)+" 円／日"
-      : (x===30 ? "最大。利益 9,800 円／日（これが答え）" : "利益 "+yen(p)+" 円／日");
+    read.innerHTML="<b>"+price+" 円</b>";
+    var tail="",cls="";
+    if(p<0){tail="　赤字";cls="hit";}
+    else if(p===0){tail="　← 黒字と赤字の境界";cls="hit";}
+    else if(x===30){tail="　← これが最大";cls="ok";}
+    state.className="statebox "+cls;
+    state.textContent="1個あたり "+num(per)+" 円 × "+num(n)+" 個 = "+yen(p)+" 円／日"+tail;
   }
   slider.addEventListener("input",upd);
-  dragAlongX(svg,scInv(-55,115,62,436),-45,105,1,
+  dragAlongX(svg,scInv(-55,115,62,436),-45,100,1,
     function(){return +slider.value;},function(v){slider.value=v;upd();});
   upd();
 })();
@@ -968,7 +1013,7 @@ var nfc={raf:0,phase:0};
 /* ══════════ 進行 ══════════ */
 (function(){
   var META=[["問い","20秒"],["三つの情報","60秒"],["三つの本質","30秒"],["① 力学","50秒"],
-            ["② 通信","40秒"],["③ インフラ","40秒"],["④ 経済","50秒"],["締め","30秒"]];
+            ["② 通信","40秒"],["③ インフラ","40秒"],["④ 経済","60秒"],["締め","30秒"]];
   var scenes=[].slice.call(document.querySelectorAll(".scene"));
   var stepsBox=document.getElementById("steps"), where=document.getElementById("where");
   var prev=document.getElementById("prev"), next=document.getElementById("next");
